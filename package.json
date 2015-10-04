@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "A private, personal budgeting webapp",
-  "repository": "",
+  "repository": "https://github.com/ynagasaki/cashew.git",
   "license": "MIT",
   "devDependencies": {
     "bower": "^1.3.1",
