@@ -1,6 +1,12 @@
 /* app css stylesheet */
-.lol {
-  color: pink;
-  size: 9001px;
-  visibility: hidden;
+.lineItem {
+	background-color: #562;
+}
+
+.lineItem > .name {
+	color: red;
+}
+
+.lineItem > .amount {
+	color: blue;
 }

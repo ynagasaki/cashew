@@ -11,7 +11,23 @@ angular.module('myApp.view1', ['ngRoute'])
 
 .controller('View1Ctrl', ['$scope', function($scope) {
   $scope.lineItems = [
-    "a credit card",
-    "a income"
+    {
+      'name': 'a bill',
+      'recurs': true,
+      'amount': 52.52,
+      'freq': {
+        'per': 'mo',
+        'on': [12]
+      }
+    },
+    {
+      'name': 'a income',
+      'recurs': true,
+      'amount': 100.01,
+      'freq': {
+        'per': 'mo',
+        'on': [10,25]
+      }
+    }
   ];
 }]);
