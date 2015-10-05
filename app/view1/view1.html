@@ -4,7 +4,8 @@
 <p>Welcome to the internet. This is me learning Angular: {{ 1 + 23 }}</p>
 
 <ul>
-  <li ng-repeat="lineItem in lineItems">
-    <span>{{ lineItem }}</span>
+  <li class="lineItem" ng-repeat="item in lineItems">
+    <span class="name">{{item.name}}</span>
+    <span class="amount">{{item.amount}}</span>
   </li>
 </ul>

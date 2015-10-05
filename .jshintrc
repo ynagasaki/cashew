@@ -11,5 +11,9 @@
     "inject": false
   },
   "eqeqeq": true,
-  "curly": true
+  "curly": true,
+  "nocomma": true,
+  "futurehostile": true,
+  "unused": true,
+  "varstmt": true
 }
