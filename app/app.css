@@ -1,12 +1,25 @@
 /* app css stylesheet */
+.lineItems {
+  list-style-type: none;
+  padding:0;
+  margin:0;
+}
 .lineItem {
-	background-color: #562;
+  padding: 10px;
+  font: normal 10pt sans-serif;
+  color: #999;
 }
-
 .lineItem > .name {
-	color: red;
+  font: bold 16pt sans-serif;
+  color: black;
 }
-
 .lineItem > .amount {
-	color: blue;
+  font: normal 12pt sans-serif;
+  color: black;
+}
+.lineItem > .minus {
+  color: red;
+}
+.lineItem > .plus {
+  color: green;
 }

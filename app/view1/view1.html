@@ -1,11 +1,31 @@
 
 <h2>the things (you know) page</h2>
 
-<p>Welcome to the internet. This is me learning Angular: {{ 1 + 23 }}</p>
-
-<ul>
-  <li class="lineItem" ng-repeat="item in lineItems">
-    <span class="name">{{item.name}}</span>
-    <span class="amount">{{item.amount}}</span>
+<ul class="lineItems">
+  <li class="lineItem" ng-repeat="item in view1.lineItems">
+    <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
+    <span class="name">{{item.name}}</span> in the amount of 
+    <span class="amount">{{item.amount | currency}}</span> 
   </li>
 </ul>
+
+<form class="pure-form" ng-submit="view1.addItem()">
+  <fieldset>
+    <input ng-model="view1.lineItem.name" type="text" placeholder="New line item...">
+    <input ng-model="view1.lineItem.amount" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00">
+    <select ng-model="view1.lineItem.period">
+      <option value="once">once</option>
+      <option value="mo">monthly</option>
+      <option value="yr">yearly</option>
+    </select>
+  </fieldset>
+  <div ng-show="view1.lineItem.period!=='once'">
+    <fieldset ng-repeat="date in view1.lineItem.dates">
+      <span ng-show="$index>0">and </span><span>on</span>
+      <input type="number" placeholder="month" min="1" max="12" ng-show="view1.lineItem.period==='yr'" ng-model="date.M">
+      <input type="number" placeholder="day" min="1" max="31" ng-model="date.D">
+    </fieldset>
+    <a ng-click="view1.addDateToLineItem()">and</a>
+  </div>
+  <input type="submit" class="pure-button" value="Doot">
+</form>

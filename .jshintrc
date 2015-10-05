@@ -14,6 +14,5 @@
   "curly": true,
   "nocomma": true,
   "futurehostile": true,
-  "unused": true,
-  "varstmt": true
+  "unused": true
 }
