@@ -23,3 +23,16 @@
 .lineItem > .plus {
   color: green;
 }
+fieldset.dates {
+  display: inline-block;
+  margin-left: 5px;
+}
+#lineItemAdder {
+  margin-left: 10px;
+}
+input.num_long {
+  width: 120px;
+}
+input.num_short {
+  width: 80px;
+}

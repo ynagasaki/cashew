@@ -9,10 +9,11 @@
   </li>
 </ul>
 
-<form class="pure-form" ng-submit="view1.addItem()">
+<form class="pure-form" ng-submit="view1.addItem()" id="lineItemAdder">
   <fieldset>
     <input ng-model="view1.lineItem.name" type="text" placeholder="New line item...">
-    <input ng-model="view1.lineItem.amount" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00">
+    <input class="num_long" ng-model="view1.lineItem.amount" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00">
+    <span>occurs</span>
     <select ng-model="view1.lineItem.period">
       <option value="once">once</option>
       <option value="mo">monthly</option>
@@ -20,12 +21,14 @@
     </select>
   </fieldset>
   <div ng-show="view1.lineItem.period!=='once'">
-    <fieldset ng-repeat="date in view1.lineItem.dates">
+    <fieldset ng-repeat="date in view1.lineItem.dates" class="dates">
       <span ng-show="$index>0">and </span><span>on</span>
-      <input type="number" placeholder="month" min="1" max="12" ng-show="view1.lineItem.period==='yr'" ng-model="date.M">
-      <input type="number" placeholder="day" min="1" max="31" ng-model="date.D">
+      <input class="num_short" type="number" placeholder="month" min="1" max="12" ng-show="view1.lineItem.period==='yr'" ng-model="date.M">
+      <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D">
     </fieldset>
-    <a ng-click="view1.addDateToLineItem()">and</a>
+    <button type="button" class="pure-button" ng-click="view1.addDateToLineItem()" ng-disabled="!view1.lineItemDatesAllUsed()">
+      <i class="fa fa-plus"></i>
+    </button>
   </div>
-  <input type="submit" class="pure-button" value="Doot">
+  <input type="submit" class="pure-button pure-button-primary" value="Add line item" ng-disabled="view1.inputProblems().length>0">
 </form>
