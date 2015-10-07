@@ -9,10 +9,16 @@
   </li>
 </ul>
 
-<form class="pure-form" ng-submit="view1.addItem()" id="lineItemAdder">
+<form class="pure-form" ng-submit="view1.addItem()" name="itemAdder" id="itemAdder">
   <fieldset>
-    <input ng-model="view1.lineItem.name" type="text" placeholder="New line item...">
-    <input class="num_long" ng-model="view1.lineItem.amount" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00">
+    <div class="field">
+      <input name="name" ng-model="view1.lineItem.name" ng-model-options="{ updateOn: 'blur' }" type="text" placeholder="New line item..." required>
+      <!-- span class="error" ng-show="!validName(view1.lineItem)">Cannot be blank.</span -->
+    </div>
+    <div class="field">
+      <input name="amt" class="num_long" ng-model="view1.lineItem.amount" ng-model-options="{ updateOn: 'blur' }" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
+      <!-- span class="error" ng-show="!validAmount(view1.lineItem)">Invalid amount.</span -->
+    </div>
     <span>occurs</span>
     <select ng-model="view1.lineItem.period">
       <option value="once">once</option>
@@ -22,13 +28,36 @@
   </fieldset>
   <div ng-show="view1.lineItem.period!=='once'">
     <fieldset ng-repeat="date in view1.lineItem.dates" class="dates">
-      <span ng-show="$index>0">and </span><span>on</span>
-      <input class="num_short" type="number" placeholder="month" min="1" max="12" ng-show="view1.lineItem.period==='yr'" ng-model="date.M">
-      <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D">
+      <div class="field">
+        <span ng-show="$index>0">and </span><span>on</span>
+        <select ng-show="view1.lineItem.period==='yr'" ng-model="date.M">
+          <option value="1">Jan</option>
+          <option value="2">Feb</option>
+          <option value="3">Mar</option>
+          <option value="4">Apr</option>
+          <option value="5">May</option>
+          <option value="6">Jun</option>
+          <option value="7">Jul</option>
+          <option value="8">Aug</option>
+          <option value="9">Sep</option>
+          <option value="10">Oct</option>
+          <option value="11">Nov</option>
+          <option value="12">Dec</option>
+        </select>
+        <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D" ng-model-options="{ debounce: 100 }">
+        <!-- span class="error" ng-show="date.M && date.D && isInvalidDate(date)">Date invalid or not allowed.</span -->
+      </div>
     </fieldset>
-    <button type="button" class="pure-button" ng-click="view1.addDateToLineItem()" ng-disabled="!view1.lineItemDatesAllUsed()">
+    <button type="button" class="pure-button" ng-click="view1.addDateToLineItem()" ng-disabled="!view1.allowAddingDate()">
       <i class="fa fa-plus"></i>
     </button>
   </div>
-  <input type="submit" class="pure-button pure-button-primary" value="Add line item" ng-disabled="view1.inputProblems().length>0">
+  <span class="fake_button" ng-hide="getErrorMessage(view1.lineItem)===null">
+    <i class="fa fa-question-circle"></i>
+    {{getErrorMessage(view1.lineItem)}}
+  </span>
+  <button class="fake_button valid_button" ng-show="getErrorMessage(view1.lineItem)===null">
+    <i class="fa fa-check-circle"></i>
+    add line item
+  </button>
 </form>

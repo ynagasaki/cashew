@@ -27,7 +27,7 @@ fieldset.dates {
   display: inline-block;
   margin-left: 5px;
 }
-#lineItemAdder {
+#itemAdder {
   margin-left: 10px;
 }
 input.num_long {
@@ -35,4 +35,33 @@ input.num_long {
 }
 input.num_short {
   width: 80px;
+}
+div.field {
+  display: inline-block;
+  vertical-align: top;
+}
+div.field > span.error {
+  display: block;
+  margin-top: 3px;
+  border-radius: 5px;
+  border: solid 2px #EE514C;
+  font: normal 10pt sans-serif;
+  color: #EE514C;
+  padding: 5px;
+}
+fieldset.dates {
+  padding-top: 0;
+  vertical-align: top;
+}
+.fake_button {
+  display: inline-block;
+  padding: 5px;
+  border: solid 2px #B5DEFF;
+  color: #1F8DEE;
+  border-radius: 8px;
+}
+.valid_button {
+  border-color: #A1F089;
+  color: #5EB95E;
+  background-color: transparent;
 }

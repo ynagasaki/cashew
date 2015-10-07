@@ -13,7 +13,7 @@ angular.module('myApp.view1', ['ngRoute'])
 .controller('View1Ctrl', ['$scope', function($scope) {
   $scope.isInvalidDate = function(d) {
     if (d.M) {
-      switch (d.M) {
+      switch (parseInt(d.M)) {
         case 1:
         case 3:
         case 5:
@@ -21,21 +21,56 @@ angular.module('myApp.view1', ['ngRoute'])
         case 8:
         case 10:
         case 12:
-          return d.D === 31;
+          return d.D > 31;
         case 2:
-          return d.D === 28;
+          return d.D > 28;
         case 4:
         case 6:
         case 9:
         case 11:
-          return d.D === 30;
+          return d.D > 30;
         default:
           return false;
       }
-      return !isNaN(d.M) && !isNaN(d.D);
+      return isNaN(d.M) || isNaN(d.D);
     }
-    return !isNaN(d.D);
+    return isNaN(d.D);
   };
+  $scope.validName = function(lineItem) {
+    return !lineItem || !lineItem.name || lineItem.name.toString().trim().length > 0;
+  }
+  $scope.validAmount = function(lineItem) {
+    return parseInt(lineItem.amount) !== 0;
+  }
+
+  $scope.getErrorMessage = function(item) {
+    var dates = [];
+    if (!item.name) { return "Please enter a name."; }
+    if (!item.amount || parseFloat(item.amount) === 0) { return "Please enter a valid, non-zero amount of money."; }
+    if (item.period === 'mo') {
+      for (var i in item.dates) {
+        var d = item.dates[i];
+        if (d.D && !isNaN(d.D) && d.D <= 28) {
+          dates.push({D: d.D});
+        }
+      }
+      if (dates.length === 0 || dates.length < item.dates.length) {
+        return "Missing or invalid days (only days 1 to 28 are supported).";
+      }
+    } else if (item.period === 'yr') {
+      for (var i in item.dates) {
+        var d = item.dates[i];
+        if (d.M && !$scope.isInvalidDate(d)) {
+          dates.push({D: d.D, M: d.M});
+        }
+      }
+      if (dates.length === 0 || dates.length < item.dates.length) {
+        return "Missing or invalid dates.";
+      }
+    }
+    return null;
+  }
+
   this.lineItem = { period: 'mo', dates: [{}] };
   this.addItem = function() {
     this.lineItem.type = this.lineItem.amount < 0 ? 'minus' : 'plus';
@@ -44,7 +79,7 @@ angular.module('myApp.view1', ['ngRoute'])
     this.lineItems.push(this.lineItem);
     this.lineItem = { period: 'mo', dates: [{}] };
   };
-  this.lineItemDatesAllUsed = function() {
+  this.allowAddingDate = function() {
     if (this.lineItem.period==='mo') {
       for (var i = 0; i < this.lineItem.dates.length; ++i) {
         var elem = this.lineItem.dates[i];
@@ -55,7 +90,7 @@ angular.module('myApp.view1', ['ngRoute'])
     } else if (this.lineItem.period==='yr') {
       for (var i = 0; i < this.lineItem.dates.length; ++i) {
         var elem = this.lineItem.dates[i];
-        if (!elem.D || !elem.M) {
+        if (!elem.D || !elem.M || $scope.isInvalidDate(elem)) {
           return false;
         }
       }
@@ -65,16 +100,6 @@ angular.module('myApp.view1', ['ngRoute'])
   this.addDateToLineItem = function() {
     this.lineItem.dates.push({});
   };
-  this.inputProblems = function() {
-    var result = [];
-    if (!this.lineItem.name || !this.lineItem.name.toString().trim()) {
-      result.push("missing description")
-    }
-    if (!this.lineItem.amount || this.lineItem.amount===0) {
-      result.push("missing amount")
-    }
-    return result;
-  }
   this.lineItems = [
     {
       name: 'a bill',
