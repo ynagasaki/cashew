@@ -12,12 +12,10 @@
 <form class="pure-form" ng-submit="view1.addItem()" name="itemAdder" id="itemAdder">
   <fieldset>
     <div class="field">
-      <input name="name" ng-model="view1.lineItem.name" ng-model-options="{ updateOn: 'blur' }" type="text" placeholder="New line item..." required>
-      <!-- span class="error" ng-show="!validName(view1.lineItem)">Cannot be blank.</span -->
+      <input name="name" ng-model="view1.lineItem.name" ng-model-options="{ debounce: 200 }" type="text" placeholder="New line item..." required>
     </div>
     <div class="field">
-      <input name="amt" class="num_long" ng-model="view1.lineItem.amount" ng-model-options="{ updateOn: 'blur' }" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
-      <!-- span class="error" ng-show="!validAmount(view1.lineItem)">Invalid amount.</span -->
+      <input name="amt" class="num_long" ng-model="view1.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
     </div>
     <span>occurs</span>
     <select ng-model="view1.lineItem.period">
@@ -44,20 +42,19 @@
           <option value="11">Nov</option>
           <option value="12">Dec</option>
         </select>
-        <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D" ng-model-options="{ debounce: 100 }">
-        <!-- span class="error" ng-show="date.M && date.D && isInvalidDate(date)">Date invalid or not allowed.</span -->
+        <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D" ng-model-options="{ debounce: 200 }">
       </div>
     </fieldset>
     <button type="button" class="pure-button" ng-click="view1.addDateToLineItem()" ng-disabled="!view1.allowAddingDate()">
       <i class="fa fa-plus"></i>
     </button>
   </div>
-  <span class="fake_button" ng-hide="getErrorMessage(view1.lineItem)===null">
+  <span name="instructions" class="fake_button" ng-hide="getErrorMessage(view1.lineItem)===null">
     <i class="fa fa-question-circle"></i>
     {{getErrorMessage(view1.lineItem)}}
   </span>
   <button class="fake_button valid_button" ng-show="getErrorMessage(view1.lineItem)===null">
     <i class="fa fa-check-circle"></i>
-    add line item
+    Add line item.
   </button>
 </form>

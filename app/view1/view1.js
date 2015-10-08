@@ -13,6 +13,9 @@ angular.module('myApp.view1', ['ngRoute'])
 .controller('View1Ctrl', ['$scope', function($scope) {
   $scope.isInvalidDate = function(d) {
     if (d.M) {
+      if (!d.D) { 
+        return true;
+      }
       switch (parseInt(d.M)) {
         case 1:
         case 3:
@@ -32,24 +35,18 @@ angular.module('myApp.view1', ['ngRoute'])
         default:
           return false;
       }
-      return isNaN(d.M) || isNaN(d.D);
+      return isNaN(d.M) || d.D && isNaN(d.D);
     }
-    return isNaN(d.D);
+    return d.D && isNaN(d.D);
   };
-  $scope.validName = function(lineItem) {
-    return !lineItem || !lineItem.name || lineItem.name.toString().trim().length > 0;
-  }
-  $scope.validAmount = function(lineItem) {
-    return parseInt(lineItem.amount) !== 0;
-  }
 
   $scope.getErrorMessage = function(item) {
-    var dates = [];
+    var i, d, dates = [];
     if (!item.name) { return "Please enter a name."; }
     if (!item.amount || parseFloat(item.amount) === 0) { return "Please enter a valid, non-zero amount of money."; }
     if (item.period === 'mo') {
-      for (var i in item.dates) {
-        var d = item.dates[i];
+      for (i in item.dates) {
+        d = item.dates[i];
         if (d.D && !isNaN(d.D) && d.D <= 28) {
           dates.push({D: d.D});
         }
@@ -58,8 +55,8 @@ angular.module('myApp.view1', ['ngRoute'])
         return "Missing or invalid days (only days 1 to 28 are supported).";
       }
     } else if (item.period === 'yr') {
-      for (var i in item.dates) {
-        var d = item.dates[i];
+      for (i in item.dates) {
+        d = item.dates[i];
         if (d.M && !$scope.isInvalidDate(d)) {
           dates.push({D: d.D, M: d.M});
         }
@@ -69,7 +66,7 @@ angular.module('myApp.view1', ['ngRoute'])
       }
     }
     return null;
-  }
+  };
 
   this.lineItem = { period: 'mo', dates: [{}] };
   this.addItem = function() {
@@ -80,23 +77,24 @@ angular.module('myApp.view1', ['ngRoute'])
     this.lineItem = { period: 'mo', dates: [{}] };
   };
   this.allowAddingDate = function() {
+    var i, elem;
     if (this.lineItem.period==='mo') {
-      for (var i = 0; i < this.lineItem.dates.length; ++i) {
-        var elem = this.lineItem.dates[i];
+      for (i = 0; i < this.lineItem.dates.length; ++i) {
+        elem = this.lineItem.dates[i];
         if (!elem.D) {
           return false;
         }
       }
     } else if (this.lineItem.period==='yr') {
-      for (var i = 0; i < this.lineItem.dates.length; ++i) {
-        var elem = this.lineItem.dates[i];
+      for (i = 0; i < this.lineItem.dates.length; ++i) {
+        elem = this.lineItem.dates[i];
         if (!elem.D || !elem.M || $scope.isInvalidDate(elem)) {
           return false;
         }
       }
     }
     return true;
-  }
+  };
   this.addDateToLineItem = function() {
     this.lineItem.dates.push({});
   };
