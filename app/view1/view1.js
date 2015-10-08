@@ -70,10 +70,19 @@ angular.module('myApp.view1', ['ngRoute'])
 
   this.lineItem = { period: 'mo', dates: [{}] };
   this.addItem = function() {
-    this.lineItem.type = this.lineItem.amount < 0 ? 'minus' : 'plus';
-    this.lineItem.amount = Math.abs(this.lineItem.amount);
-    this.lineItem.recurs = this.lineItem.period === 'once';
-    this.lineItems.push(this.lineItem);
+    var item = {};
+    
+    item.name = this.lineItem.name;
+    item.type = this.lineItem.amount < 0 ? 'minus' : 'plus';
+    item.amount = Math.abs(this.lineItem.amount);
+    item.recurs = this.lineItem.period !== 'once';
+    item.freq = {};
+    if (item.recurs) {
+      item.freq.per = this.lineItem.period;
+      item.freq.on = this.lineItem.dates;
+    }
+    this.lineItems.push(item);
+    
     this.lineItem = { period: 'mo', dates: [{}] };
   };
   this.allowAddingDate = function() {

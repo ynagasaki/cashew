@@ -6,6 +6,13 @@
     <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
     <span class="name">{{item.name}}</span> in the amount of 
     <span class="amount">{{item.amount | currency}}</span> 
+    <span ng-show="item.freq">
+      every {{item.freq.per}} on 
+      <span ng-repeat="date in item.freq.on">
+        <span ng-show="date.M">{{date.M}}/</span>
+        <span>{{date.D}}</span>
+      </span>
+    </span>
   </li>
 </ul>
 
