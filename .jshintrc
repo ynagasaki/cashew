@@ -8,7 +8,8 @@
     "beforeEach": false,
     "afterEach": false,
     "module": false,
-    "inject": false
+    "inject": false,
+    "console": false
   },
   "eqeqeq": true,
   "curly": true,

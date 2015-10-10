@@ -10,7 +10,7 @@ angular.module('myApp.view1', ['ngRoute'])
   });
 }])
 
-.controller('View1Ctrl', ['$scope', function($scope) {
+.controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
   $scope.isInvalidDate = function(d) {
     if (d.M) {
       if (!d.D) { 
@@ -83,6 +83,12 @@ angular.module('myApp.view1', ['ngRoute'])
     }
     this.lineItems.push(item);
     
+    $http.post('/api/addLineItem', '{"lol":1}', {xsrfHeaderName:"yoshi-x"}).then(function (result) {
+      console.log("add success: " + result.data.msg);
+    }, function (result) {
+      console.log("add failed: " + result.data.msg);
+    });
+
     this.lineItem = { period: 'mo', dates: [{}] };
   };
   this.allowAddingDate = function() {
