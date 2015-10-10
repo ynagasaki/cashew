@@ -2,13 +2,13 @@
 
 describe('myApp.view1 module', function() {
 
-  beforeEach(module('myApp.view1'));
+  beforeEach(module('myApp.LineItemLister'));
 
   describe('view1 controller', function(){
 
     it('should ....', inject(function($controller) {
-      var scope = {};
-      var view1Ctrl = $controller('View1Ctrl', {$scope:scope});
+      var noop = function() {};
+      var view1Ctrl = $controller('LineItemLister', {$scope:{$on:noop}, LineItemsService:{lineItems:[], put:noop, refresh:noop}});
       expect(view1Ctrl).toBeDefined();
     }));
 
