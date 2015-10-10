@@ -11,6 +11,8 @@ angular.module('myApp.view1', ['ngRoute'])
 }])
 
 .controller('View1Ctrl', ['$scope', '$http', function($scope, $http) {
+  var view = this;
+
   $scope.isInvalidDate = function(d) {
     if (d.M) {
       if (!d.D) { 
@@ -41,27 +43,27 @@ angular.module('myApp.view1', ['ngRoute'])
   };
 
   $scope.getErrorMessage = function(item) {
-    var i, d, dates = [];
+    var i, d, dates = 0;
     if (!item.name) { return "Please enter a name."; }
     if (!item.amount || parseFloat(item.amount) === 0) { return "Please enter a valid, non-zero amount of money."; }
     if (item.period === 'mo') {
       for (i in item.dates) {
         d = item.dates[i];
         if (d.D && !isNaN(d.D) && d.D <= 28) {
-          dates.push({D: d.D});
+          dates++;
         }
       }
-      if (dates.length === 0 || dates.length < item.dates.length) {
+      if (dates === 0 || dates < item.dates.length) {
         return "Missing or invalid days (only days 1 to 28 are supported).";
       }
     } else if (item.period === 'yr') {
       for (i in item.dates) {
         d = item.dates[i];
         if (d.M && !$scope.isInvalidDate(d)) {
-          dates.push({D: d.D, M: d.M});
+          dates++;
         }
       }
-      if (dates.length === 0 || dates.length < item.dates.length) {
+      if (dates === 0 || dates < item.dates.length) {
         return "Missing or invalid dates.";
       }
     }
@@ -77,21 +79,29 @@ angular.module('myApp.view1', ['ngRoute'])
     item.type = this.lineItem.amount < 0 ? 'minus' : 'plus';
     item.amount = Math.abs(this.lineItem.amount);
     item.recurs = this.lineItem.period !== 'once';
-    item.freq = {};
     if (item.recurs) {
+      item.freq = {};
       item.freq.per = this.lineItem.period;
       item.freq.on = this.lineItem.dates;
+      this.lineItem.dates.forEach(function (date) {
+        if (date.M) {
+          date.M = parseInt(date.M);
+        }
+      });
+    } else {
+      item.freq = null;
     }
     
     $http.put('/api/addLineItem', item).then(function (result) {
-      console.log("add success: " + result.data.msg + ": " + result.data.data.rev);
+      console.log("inserted: " + result.data.data.id + ", " + result.data.data.rev);
       lineItems.push(item);
     }, function (result) {
-      console.log("add failed: " + result.data.msg + ": " + result.data.data.message);
+      console.log("failed to save: " + result.data.msg + ": " + result.data.data.message);
     });
 
     this.lineItem = { period: 'mo', dates: [{}] };
   };
+
   this.allowAddingDate = function() {
     var i, elem;
     if (this.lineItem.period==='mo') {
@@ -111,29 +121,14 @@ angular.module('myApp.view1', ['ngRoute'])
     }
     return true;
   };
+
   this.addDateToLineItem = function() {
     this.lineItem.dates.push({});
   };
-  this.lineItems = [
-    {
-      name: 'a bill',
-      type: 'minus',
-      recurs: true,
-      amount: 52.52,
-      freq: {
-        per: 'mo',
-        on: [{D: 12}]
-      }
-    },
-    {
-      name: 'a income',
-      type: 'plus',
-      recurs: true,
-      amount: 100.01,
-      freq: {
-        per: 'mo',
-        on: [{D: 10}, {D: 25}]
-      }
-    }
-  ];
+
+  $http.get('/api/getLineItems').then(function (result) {
+    view.lineItems = result.data.data;
+  }, function (result) {
+    view.lineItems = [];
+  });
 }]);

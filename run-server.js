@@ -12,11 +12,24 @@
     res.send('world!');
   });
 
+  app.get('/api/getLineItems', function (req, res) {
+    line_items.list({ include_docs: true }, function (err, body) {
+      if (err) {
+        res.status(500).json({ msg: "error: could not get line items", data: err});
+      }
+      var items = [];
+      body.rows.forEach(function (row) {
+        items.push(row.doc);
+      });
+      res.json({ data: items});
+    });
+  });
+
   app.put('/api/addLineItem', jsonParser, function (req, res) {
     if (!req.body) {
       return res.status(400).json({ msg: "error: no body" });
     }
-    line_items.insert(req.body, 'jankomcstanko', function(err, body, header) {
+    line_items.insert(req.body, function(err, body, header) {
       if (err) {
         res.status(500).json({ msg: "error: save failed", data: err });
         return;
