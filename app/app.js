@@ -2,7 +2,7 @@
 
 (function() {
   /* Services */
-  angular.module('myApp.services', [])
+  angular.module('cashewApp.services', [])
 
   .factory('LineItemsService', ['$http', '$rootScope', function($http, $rootScope) {
     var serv = {};
@@ -30,13 +30,13 @@
   }]);
 
   /* App */
-  angular.module('myApp', [
+  angular.module('cashewApp', [
     'ngRoute',
-    'myApp.view2',
-    'myApp.LineItemAdder',
-    'myApp.LineItemLister',
-    'myApp.version',
-    'myApp.services'
+    'cashewApp.view2',
+    'cashewApp.LineItemAdder',
+    'cashewApp.LineItemLister',
+    'cashewApp.version',
+    'cashewApp.services'
   ])
 
   .config(['$routeProvider', function($routeProvider) {

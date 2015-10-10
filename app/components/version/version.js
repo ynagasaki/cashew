@@ -1,8 +1,8 @@
 'use strict';
 
-angular.module('myApp.version', [
-  'myApp.version.interpolate-filter',
-  'myApp.version.version-directive'
+angular.module('cashewApp.version', [
+  'cashewApp.version.interpolate-filter',
+  'cashewApp.version.version-directive'
 ])
 
 .value('version', '0.1');

@@ -1,8 +1,8 @@
 'use strict';
 
-describe('myApp.view1 module', function() {
+describe('cashewApp.view1 module', function() {
 
-  beforeEach(module('myApp.LineItemLister'));
+  beforeEach(module('cashewApp.LineItemLister'));
 
   describe('view1 controller', function(){
 

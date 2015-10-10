@@ -1,7 +1,7 @@
 'use strict';
 
 (function() {
-  var lister = angular.module('myApp.LineItemLister', ['ngRoute']);
+  var lister = angular.module('cashewApp.LineItemLister', ['ngRoute']);
 
   lister.config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/line-items', {

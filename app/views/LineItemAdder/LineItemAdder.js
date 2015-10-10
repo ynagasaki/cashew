@@ -1,7 +1,7 @@
 'use strict';
 
 (function() {
-  angular.module('myApp.LineItemAdder', [])
+  angular.module('cashewApp.LineItemAdder', [])
 
   .directive('lineItemAdder', function() {
     return {
