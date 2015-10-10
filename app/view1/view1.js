@@ -129,6 +129,7 @@ angular.module('myApp.view1', ['ngRoute'])
   $http.get('/api/getLineItems').then(function (result) {
     view.lineItems = result.data.data;
   }, function (result) {
+    console.log("failed to get items: " + result.data);
     view.lineItems = [];
   });
 }]);
