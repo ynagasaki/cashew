@@ -71,6 +71,7 @@ angular.module('myApp.view1', ['ngRoute'])
   this.lineItem = { period: 'mo', dates: [{}] };
   this.addItem = function() {
     var item = {};
+    var lineItems = this.lineItems;
     
     item.name = this.lineItem.name;
     item.type = this.lineItem.amount < 0 ? 'minus' : 'plus';
@@ -81,12 +82,12 @@ angular.module('myApp.view1', ['ngRoute'])
       item.freq.per = this.lineItem.period;
       item.freq.on = this.lineItem.dates;
     }
-    this.lineItems.push(item);
     
-    $http.post('/api/addLineItem', '{"lol":1}', {xsrfHeaderName:"yoshi-x"}).then(function (result) {
-      console.log("add success: " + result.data.msg);
+    $http.put('/api/addLineItem', item).then(function (result) {
+      console.log("add success: " + result.data.msg + ": " + result.data.data.rev);
+      lineItems.push(item);
     }, function (result) {
-      console.log("add failed: " + result.data.msg);
+      console.log("add failed: " + result.data.msg + ": " + result.data.data.message);
     });
 
     this.lineItem = { period: 'mo', dates: [{}] };
