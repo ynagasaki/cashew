@@ -24,7 +24,7 @@
       body.rows.forEach(function (row) {
         items.push(row.doc);
       });
-      res.json({ data: items});
+      res.json({ data: items });
     });
   });
 

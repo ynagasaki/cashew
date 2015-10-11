@@ -7,10 +7,14 @@
   .factory('LineItemsService', ['$http', '$rootScope', function($http, $rootScope) {
     var serv = {};
     serv.lineItems = [];
+
     serv.put = function(item) {
       var me = this;
       $http.put('/api/addLineItem', item).then(function (result) {
-        if (result.data.data.ok) {
+        var payload = result.data.data;
+        if (payload.ok) {
+          item._id = payload.id;
+          item._rev = payload.rev;
           me.lineItems.push(item);
           $rootScope.$broadcast("lineitems.added");
         }
@@ -18,10 +22,11 @@
         console.log("failed to save: " + result.data.data.message);
       });
     };
+
     serv.refresh = function() {
       var me = this;
       $http.get('/api/getLineItems').then(function (result) {
-        if (result.data.data.ok) {
+        if (result.data.data) {
           me.lineItems = result.data.data;
           $rootScope.$broadcast("lineitems.refreshed");
         }
@@ -29,17 +34,25 @@
         console.log("failed to get items: " + result.data);
       });
     };
-    serv.remove = function(item, idx) {
+
+    serv.remove = function(item) {
       var me = this;
       $http.delete('/api/rmLineItem/' + item._id + '/' + item._rev).then(function (result) {
         if (result.data.data.ok) {
-          me.lineItems.splice(idx, 1);
+          var i = 0;
+          for (; i < me.lineItems.length; ++i) {
+            if (me.lineItems[i]._id === item._id) {
+              break;
+            }
+          }
+          me.lineItems.splice(i, 1);
           $rootScope.$broadcast("lineitems.removed");
         }
       }, function (result) {
         console.log("failed to remove: " + result.data);
       });
     };
+    
     return serv;
   }]);
 
