@@ -1,7 +1,9 @@
 .cashew-nav {
-  margin: 0 10px 0 10px;
+  background-color: #EEE;
+  /*border-bottom: solid 1px #EFEFEF;*/
 }
 .cashew-brand {
+  margin-left: 10px;
   background-color: #9DE352; /* #A5E85D; */
   color: white;
   text-shadow: 1px 1px #6BCF00;
@@ -12,8 +14,12 @@
 .cashew-brand:hover {
   background-color: #A5E85D;
 }
-.cashew-nav .pure-menu-list {
-  border-bottom: solid 1px #EEE;
+.cashew-nav li {
+  line-height: 18pt;
+  margin-left: 1px;
+}
+.cashew-nav-link:hover {
+  background-color: #F8F8F8;
 }
 
 .lineItems {
