@@ -1,4 +1,21 @@
-/* app css stylesheet */
+.cashew-nav {
+  margin: 0 10px 0 10px;
+}
+.cashew-brand {
+  background-color: #9DE352; /* #A5E85D; */
+  color: white;
+  text-shadow: 1px 1px #6BCF00;
+  font-size: 14pt;
+  font-family: 'Capriola', sans-serif;
+  text-transform: none;
+}
+.cashew-brand:hover {
+  background-color: #A5E85D;
+}
+.cashew-nav .pure-menu-list {
+  border-bottom: solid 1px #EEE;
+}
+
 .lineItems {
   list-style-type: none;
   padding:0;
