@@ -10,20 +10,34 @@
     serv.put = function(item) {
       var me = this;
       $http.put('/api/addLineItem', item).then(function (result) {
-        console.log("inserted: " + result.data.data.id + ", " + result.data.data.rev);
-        me.lineItems.push(item);
-        $rootScope.$broadcast("lineitems.added");
+        if (result.data.data.ok) {
+          me.lineItems.push(item);
+          $rootScope.$broadcast("lineitems.added");
+        }
       }, function (result) {
-        console.log("failed to save: " + result.data.msg + ": " + result.data.data.message);
+        console.log("failed to save: " + result.data.data.message);
       });
     };
     serv.refresh = function() {
       var me = this;
       $http.get('/api/getLineItems').then(function (result) {
-        me.lineItems = result.data.data;
-        $rootScope.$broadcast("lineitems.refreshed");
+        if (result.data.data.ok) {
+          me.lineItems = result.data.data;
+          $rootScope.$broadcast("lineitems.refreshed");
+        }
       }, function (result) {
         console.log("failed to get items: " + result.data);
+      });
+    };
+    serv.remove = function(item, idx) {
+      var me = this;
+      $http.delete('/api/rmLineItem/' + item._id + '/' + item._rev).then(function (result) {
+        if (result.data.data.ok) {
+          me.lineItems.splice(idx, 1);
+          $rootScope.$broadcast("lineitems.removed");
+        }
+      }, function (result) {
+        console.log("failed to remove: " + result.data);
       });
     };
     return serv;

@@ -16,13 +16,16 @@
 
     me.lineItems = [];
 
-    $scope.$on('lineitems.added', function () {
+    me.updateLineItems = function () {
       me.lineItems = LineItemsService.lineItems;
-    });
+    };
+    me.removeLineItem = function(item) {
+      LineItemsService.remove(item);
+    };
 
-    $scope.$on('lineitems.refreshed', function () {
-      me.lineItems = LineItemsService.lineItems;
-    });
+    $scope.$on('lineitems.added', me.updateLineItems);
+    $scope.$on('lineitems.refreshed', me.updateLineItems);
+    $scope.$on('lineitems.removed', me.updateLineItems);
 
     LineItemsService.refresh();
   }]);

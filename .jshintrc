@@ -9,7 +9,8 @@
     "afterEach": false,
     "module": false,
     "inject": false,
-    "console": false
+    "console": false,
+    "require": false
   },
   "eqeqeq": true,
   "curly": true,

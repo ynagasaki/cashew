@@ -19,7 +19,7 @@
   "scripts": {
     "postinstall": "bower install",
     "prestart": "npm install",
-    "start": "node run-server.js",
+    "start": "node cashew-server.js",
     "pretest": "npm install",
     "test": "karma start karma.conf.js",
     "preupdate-webdriver": "npm install",

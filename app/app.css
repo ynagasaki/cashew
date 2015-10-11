@@ -23,6 +23,12 @@
 .lineItem > .plus {
   color: green;
 }
+.lineItem .showOnHover {
+  visibility: hidden;
+}
+.lineItem:hover .showOnHover {
+  visibility: visible;
+}
 fieldset.dates {
   display: inline-block;
   margin-left: 5px;
