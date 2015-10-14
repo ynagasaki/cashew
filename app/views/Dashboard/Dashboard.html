@@ -10,7 +10,7 @@
     </div>
   </div>
   <div class="pure-u-2-3">
-    <table class="pure-table" style="width: 100%;">
+    <table class="pure-table pure-table-bordered" style="width: 100%;">
       <thead style="height: 35px;">
         <tr>
           <th>Sun</th>
@@ -22,9 +22,15 @@
           <th>Sat</th>
         </tr>
       </thead>
-      <tbody style="height: 450px;">
-        <tr ng-repeat="r in [0,1,2,3,4]">
-          <td ng-repeat="c in [1,2,3,4,5,6,7]" style="width: 14%">{{ dash.nextMonthCalendarIndexToDayLabel(r * 7 + c) }}</td>
+      <tbody>
+        <tr ng-repeat="week in dash.datesArray">
+          <td ng-repeat="d in week" style="width: 14%; vertical-align: top; text-align: right;">
+            <!-- dash.nextMonthCalendarIndexToDayLabel(r * 7 + c) -->
+            <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" style="text-transform: uppercase; font-weight: bold; font-size: 10pt;">{{ d | date: 'MMM' }}</span>
+            <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
+            <span ng-show="dash.isToday(d)">(Today)</span>
+            <span ng-repeat="item in dash.payablesOn(d)" style="display: block;font: 10pt sans-serif; color: #F24968; border: solid 1px #FFBFCB; border-radius: 3px; padding: 3px;">{{item.amount | currency}}</span>
+          </td>
         </tr>
       </tbody>
     </table>

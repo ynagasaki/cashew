@@ -27,14 +27,10 @@
         0
       );
     };
-
     var lastDayOfMonth = function(date) {
       var firstDayNextMonth = firstDayOfNextMonth(date);
       return new Date(firstDayNextMonth - 1);
     };
-
-    var nextMonthFirstDate = firstDayOfNextMonth(new Date());
-
     me.nextMonthCalendarIndexToDayLabel = function(idx) {
       var nextMonthStartDay = nextMonthFirstDate.getDay();
       var result = idx - 1 - nextMonthStartDay;
@@ -43,6 +39,43 @@
       }
       return (result + 1).toString();
     };
+
+    var nextMonthFirstDate = firstDayOfNextMonth(new Date());
+
+    me.datesArray = (function(start, weeks) {
+      var offset = start.getDay();
+      var d = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0, 0);
+      d.setDate(d.getDate() - offset);
+      var arr = [];
+      var days, week, next;
+      while(weeks-- > 0) {
+        days = 7;
+        week = [];
+        while(days-- > 0) {
+          week.push(d);
+          next = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 0, 0, 0, 0);
+          next.setDate(d.getDate() + 1);
+          d = next;
+        }
+        arr.push(week);
+      }
+      return arr;
+    })(new Date(), 5);
+
+    me.payablesOn = function(d) {
+      var result = [];
+      me.payables.forEach(function(p) {
+        if(p.day === d.getDate()) {
+          result.push(p);
+        }
+      });
+      return result;
+    };
+
+    me.isToday = function(date) {
+      var today = new Date();
+      return today.getDate() === date.getDate() && today.getMonth() === date.getMonth() && today.getFullYear() === date.getFullYear();
+    }
 
     me.nextMonthName = [
       "January",
