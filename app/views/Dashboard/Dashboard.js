@@ -14,34 +14,26 @@
 
   dashboard.controller('DashboardController', ['$scope', 'LineItemsService', function($scope, LineItemsService) {
     var me = this;
+    var now = new Date();
+    var currDay = now.getDate();
+    var currMonth = now.getMonth();
+    var nextMonth = (currMonth + 1) % 12;
+    var monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ];
 
-    var firstDayOfNextMonth = function(date) {
-      var nextMonth = (date.getMonth() + 1) % 12;
-      return new Date(
-        nextMonth === 0 ? date.getFullYear() + 1 : date.getFullYear(),
-        nextMonth,
-        1,
-        0,
-        0,
-        0,
-        0
-      );
-    };
-    var lastDayOfMonth = function(date) {
-      var firstDayNextMonth = firstDayOfNextMonth(date);
-      return new Date(firstDayNextMonth - 1);
-    };
-    me.nextMonthCalendarIndexToDayLabel = function(idx) {
-      var nextMonthStartDay = nextMonthFirstDate.getDay();
-      var result = idx - 1 - nextMonthStartDay;
-      if ((result < 0) || (result > 27 && result > lastDayOfMonth(nextMonthFirstDate).getDate() - 1)) {
-        return null;
-      }
-      return (result + 1).toString();
-    };
-
-    var nextMonthFirstDate = firstDayOfNextMonth(new Date());
-
+    me.payables = [];
     me.datesArray = (function(start, weeks) {
       var offset = start.getDay();
       var d = new Date(start.getFullYear(), start.getMonth(), start.getDate(), 0, 0, 0, 0);
@@ -71,37 +63,25 @@
       });
       return result;
     };
-
     me.isToday = function(date) {
       var today = new Date();
       return today.getDate() === date.getDate() && today.getMonth() === date.getMonth() && today.getFullYear() === date.getFullYear();
-    }
-
-    me.nextMonthName = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"][nextMonthFirstDate.getMonth()];
-
-    me.payables = [];
-
+    };
+    me.getMonthName = function(mo) {
+      return monthNames[mo];
+    };
     /* Probably should turn this into a couchdb "view"... SIGH */
     me.updateLineItems = function () {
       LineItemsService.lineItems.forEach(function(item) {
+        var d;
         if (item.type === 'minus' && item.freq.per === 'mo') {
           for (var i = 0; i < item.freq.on.length; ++i) {
+            d = item.freq.on[i].D;
             me.payables.push({ 
               name: item.name,
               amount: item.amount,
-              day: item.freq.on[i].D
+              day: d,
+              month: (d >= currDay) ? currMonth : nextMonth
             });
           }
         }
