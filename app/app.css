@@ -94,3 +94,9 @@ fieldset.dates {
   color: #52BA11;
   background-color: transparent;
 }
+
+span.today {
+  border: solid 1px #4DC9FF;
+  border-radius: 15px;
+  padding: 3px;
+}
