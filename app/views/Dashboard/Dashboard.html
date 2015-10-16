@@ -3,15 +3,16 @@
     <div style="padding: 10px; border-bottom: solid 1px #DEDEDE;">
       <h2 style="text-transform: uppercase; color: #999; font-size: 10pt; margin: 0; padding: 0;">Upcoming Payables</h2>
     </div>
-    <div style="padding: 10px 10px 10px 20px; border-bottom: solid 1px #DEDEDE;" ng-repeat="item in dash.payables | orderBy: ['month','day']">
+    <div class="upcoming_lineitems" ng-class="{'paid': item.paid}" ng-repeat="item in dash.payables | orderBy: ['month','day']">
+      <input type="checkbox" ng-model="item.paid">
       <span style="font: 12pt sans-serif;">{{item.name}}</span>
-      <span style="font: 11pt sans-serif; color: #F24968; border: solid 1px #FFBFCB; border-radius: 3px; padding: 3px;">{{item.amount | currency}}</span>
-      <span style="font: 10pt sans-serif; padding: 0; margin: 0; float: right; color: #777;">{{dash.getMonthName(item.month).substring(0, 3)}} {{item.day}}</span>
+      <span ng-class="{'amount_label_paid' : item.paid, 'amount_label' : !item.paid}">{{item.amount | currency}}</span>
+      <span class="due_label">{{dash.getMonthName(item.month).substring(0, 3)}} {{item.day}}</span>
     </div>
   </div>
   <div class="pure-u-2-3">
-    <table class="pure-table pure-table-bordered" style="width: 100%;">
-      <thead style="height: 35px;">
+    <table id="calendar" class="pure-table pure-table-bordered">
+      <thead>
         <tr>
           <th>Sun</th>
           <th>Mon</th>
@@ -24,11 +25,11 @@
       </thead>
       <tbody>
         <tr ng-repeat="week in dash.datesArray">
-          <td ng-repeat="d in week" style="width: 14%; vertical-align: top; text-align: right;">
+          <td ng-repeat="d in week">
             <!-- dash.nextMonthCalendarIndexToDayLabel(r * 7 + c) -->
-            <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" style="text-transform: uppercase; font-weight: bold; font-size: 10pt;">{{ d | date: 'MMM' }}</span>
+            <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
             <span style="font-size: 10pt;" ng-class="{'today' : dash.isToday(d)}">{{ d | date: 'd' }}</span>
-            <span ng-repeat="item in dash.payablesOn(d)" style="display: block;font: 10pt sans-serif; color: #F24968; border: solid 1px #FFBFCB; border-radius: 3px; padding: 3px;">{{item.amount | currency}}</span>
+            <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.paid, 'amount_label' : !item.paid}">{{item.amount | currency}}</span>
           </td>
         </tr>
       </tbody>

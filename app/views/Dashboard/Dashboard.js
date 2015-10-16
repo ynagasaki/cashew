@@ -81,7 +81,8 @@
               name: item.name,
               amount: item.amount,
               day: d,
-              month: (d >= currDay) ? currMonth : nextMonth
+              month: (d >= currDay) ? currMonth : nextMonth,
+              paid: false
             });
           }
         }

@@ -1,6 +1,5 @@
 .cashew-nav {
   background-color: #EEE;
-  /*border-bottom: solid 1px #EFEFEF;*/
 }
 .cashew-brand {
   margin-left: 10px;
@@ -94,8 +93,62 @@ fieldset.dates {
   color: #52BA11;
   background-color: transparent;
 }
-
-span.today {
+/* Dashboard view */
+div.upcoming_lineitems {
+  padding: 10px 10px 10px 10px;
+  border-bottom: solid 1px #DEDEDE;
+}
+div.paid {
+  text-decoration: line-through;
+  text-decoration-color: #888;
+  color: #ccc;
+}
+span.amount_label_paid {
+  font: 11pt sans-serif;
+  color: #ccc;
+  border: solid 1px #eee;
+  border-radius: 3px;
+  padding: 3px;
+}
+span.amount_label {
+  font: 11pt sans-serif;
+  color: #F24968;
+  border: solid 1px #FFBFCB;
+  border-radius: 3px;
+  padding: 3px;
+}
+span.due_label {
+  font: 10pt sans-serif;
+  padding: 0;
+  margin: 0;
+  float: right;
+  color: #777;
+}
+/* Calendar widget */
+#calendar {
+  width: 100%;
+}
+#calendar td {
+  width: 14%;
+  vertical-align: top;
+  text-align: right;
+}
+#calendar .month_label {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 10pt;
+}
+#calendar span.amount_label {
+  display: block;
+  margin-top: 3px;
+}
+#calendar span.amount_label_paid {
+  display: block;
+  text-decoration: line-through;
+  text-decoration-color: #888;
+  margin-top: 3px;
+}
+#calendar span.today {
   border: solid 1px #4DC9FF;
   border-radius: 15px;
   padding: 3px;
