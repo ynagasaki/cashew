@@ -18,8 +18,7 @@ trap "kill $SERVER_PID" 0 1 2 3 4 5 6 7 8 9 10
 
 if [[ HINT -eq 1 ]]; then
   echo "## Running jshint tests"
-  node_modules/.bin/jshint app/ --config .jshintrc --exclude app/bower_components
-  node_modules/.bin/jshint cashew-server.js --config .jshintrc
+  node_modules/.bin/jshint app/ couchdb/ cashew-server.js reset-db.js --config .jshintrc --exclude app/bower_components
   echo "(Done)"
   echo
 fi
