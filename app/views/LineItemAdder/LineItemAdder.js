@@ -84,11 +84,14 @@
       if (item.recurs) {
         item.freq = {};
         item.freq.per = me.lineItem.period;
-        item.freq.on = me.lineItem.dates;
-        me.lineItem.dates.forEach(function (date) {
-          if (date.M) {
-            date.M = parseInt(date.M);
+        item.freq.on = [];
+        me.lineItem.dates.forEach(function(date) {
+          var on = {};
+          if (item.freq.per === 'yr' && date.M) {
+            on.M = parseInt(date.M);
           }
+          on.D = date.D;
+          item.freq.on.push(on);
         });
       } else {
         item.freq = null;

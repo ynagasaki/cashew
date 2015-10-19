@@ -2,10 +2,23 @@
 
 (function() {
   var views = {
-    'upcoming_payables': {
-      'map': function(item) {
-        if (item.doctype === 'lineitem') {
-
+    'line-items': {
+      map: function(doc) {
+        if (doc.doctype === 'lineitem') {
+          emit(doc._id, doc);
+        }
+      }
+    },
+    'payables': {
+      map: function(doc) {
+        if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq && doc.freq.per === 'mo') {
+          for (var i = 0; i < doc.freq.on.length; ++i) {
+            emit(doc._id, {
+              name: doc.name,
+              amount: doc.amount,
+              day: doc.freq.on[i].D
+            });
+          }
         }
       }
     }

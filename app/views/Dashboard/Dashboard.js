@@ -12,7 +12,7 @@
     });
   }]);
 
-  dashboard.controller('DashboardController', ['$scope', 'LineItemsService', function($scope, LineItemsService) {
+  dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
     var now = new Date();
     var currDay = now.getDate();
@@ -70,30 +70,22 @@
     me.getMonthName = function(mo) {
       return monthNames[mo];
     };
-    /* Probably should turn this into a couchdb "view"... SIGH */
-    me.updateLineItems = function () {
-      LineItemsService.lineItems.forEach(function(item) {
-        var d;
-        if (item.type === 'minus' && item.freq.per === 'mo') {
-          for (var i = 0; i < item.freq.on.length; ++i) {
-            d = item.freq.on[i].D;
-            me.payables.push({ 
-              name: item.name,
-              amount: item.amount,
-              day: d,
-              month: (d >= currDay) ? currMonth : nextMonth,
-              paid: false
-            });
-          }
-        }
+
+    me.updatePayables = function () {
+      PayablesService.payables.forEach(function(item) {
+        me.payables.push({ 
+          name: item.name,
+          amount: item.amount,
+          day: item.day,
+          month: (item.day >= currDay) ? currMonth : nextMonth,
+          paid: false
+        });
       });
     };
 
-    $scope.$on('lineitems.added', me.updateLineItems);
-    $scope.$on('lineitems.refreshed', me.updateLineItems);
-    $scope.$on('lineitems.removed', me.updateLineItems);
+    $scope.$on('payables.refreshed', me.updatePayables);
 
-    LineItemsService.refresh();
+    PayablesService.refresh();
   }]);
 
 })();
