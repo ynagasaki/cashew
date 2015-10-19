@@ -12,7 +12,8 @@
     "console": false,
     "require": false,
     "exports": false,
-    "process": false
+    "process": false,
+    "emit": false
   },
   "eqeqeq": true,
   "curly": true,
