@@ -57,30 +57,38 @@
     me.payablesOn = function(d) {
       var result = [];
       me.payables.forEach(function(p) {
-        if(p.day === d.getDate()) {
+        if(p.day === d.getDate() && p.month === d.getMonth() && p.year === d.getFullYear()) {
           result.push(p);
         }
       });
       return result;
     };
     me.isToday = function(date) {
-      var today = new Date();
-      return today.getDate() === date.getDate() && today.getMonth() === date.getMonth() && today.getFullYear() === date.getFullYear();
+      return currDay === date.getDate() && currMonth === date.getMonth() && now.getFullYear() === date.getFullYear();
     };
     me.getMonthName = function(mo) {
       return monthNames[mo];
     };
-
+    me.isOutOfRange = function(date) {
+      var mo = date.getMonth();
+      var dt = date.getDate();
+      return (mo > currMonth && dt >= currDay) || (mo <= currMonth && dt < currDay);
+    };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
         me.payables.push({ 
+          lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
           day: item.day,
           month: (item.day >= currDay) ? currMonth : nextMonth,
-          paid: false
+          year: (nextMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
+          payment: (!item.payment) ? null : item.payment
         });
       });
+    };
+    me.pay = function(payable) {
+      PayablesService.pay(payable);
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);

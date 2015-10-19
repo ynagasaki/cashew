@@ -13,12 +13,22 @@
       map: function(doc) {
         if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq && doc.freq.per === 'mo') {
           for (var i = 0; i < doc.freq.on.length; ++i) {
-            emit(doc._id, {
+            emit([doc._id, 0], {
+              doctype: 'payable',
               name: doc.name,
               amount: doc.amount,
               day: doc.freq.on[i].D
             });
           }
+        } else if (doc.doctype === 'payment') {
+          emit([doc.lineitem_id, 1], doc);
+        }
+      }
+    },
+    'payments': {
+      map: function(doc) {
+        if (doc.doctype === 'payment') {
+          emit(doc._id, doc);
         }
       }
     }
@@ -36,11 +46,13 @@
         continue;
       }
       
+      console.log('  Adding view: ' + view_name);
+
       mapper = resplace((views[view_name].map || 'lol').toString());
       reducer = resplace((views[view_name].reduce || 'lol').toString());
 
       if (mapper === 'lol') {
-        console.warn('Map method of view \'' + view_name + '\' not defined. Skipping.');
+        console.warn('  Map method of view \'' + view_name + '\' not defined. Skipping.');
         continue;
       }
 

@@ -19,7 +19,22 @@
       });
     };
 
-    $rootScope.$on('lineitems.refreshed', serv.refresh);
+    serv.pay = function(payable) {
+      $http.put('/api/pay', payable).then(function(result) {
+        var payload = result.data.data;
+        if (payload.ok) {
+          payable.payment = { id: payload.id, rev: payload.rev };
+        } else {
+          payable.payment = null;
+        }
+      }, function(result) {
+        console.log('failed to pay ' + payable.name + ': ' + result.data);
+        payable.payment = null;
+      });
+    };
+
+    $rootScope.$on('lineitems.added', serv.refresh);
+    $rootScope.$on('lineitems.removed', serv.refresh);
 
     return serv;
   }]);

@@ -10,7 +10,6 @@
 
     serv.put = function(item) {
       var me = this;
-      item.doctype = 'lineitem';
       $http.put('/api/put/line-item', item).then(function (result) {
         var payload = result.data.data;
         if (payload.ok) {

@@ -14,6 +14,27 @@
     res.send('world!');
   });
 
+  app.put('/api/pay', jsonParser, function(req, res) {
+    var payable = req.body;
+    var payment = {};
+    if (!payable) {
+      return res.status(400).json({ msg: 'error: no body' });
+    }
+    console.log('pay: ' + payable.name);
+    payment.lineitem_id = payable.lineitem_id;
+    payment.doctype = 'payment';
+    payment.day = payable.day;
+    payment.month = payable.month;
+    payment.year = payable.year;
+    cashew_db.insert(payment, function(err, body) {
+      if (err) {
+        res.status(500).json({ msg: 'error: save failed', data: err });
+        return;
+      }
+      res.json({ msg: 'inserted', data: body });
+    });
+  });
+
   app.get('/api/get/payables', function(req, res) {
     console.log('get/payables');
     cashew_db.view('app', 'payables', function(err, body) {
@@ -21,8 +42,18 @@
         res.status(500).json({ msg: 'error: could not get payables', data: err});
       }
       var items = [];
+      var last_payable;
       body.rows.forEach(function(row) {
-        items.push(row.value);
+        var value = row.value;
+        if (value.doctype === 'payable') {
+          console.log('  pushing payable: ' + value.name);
+          value.lineitem_id = row.key[0];
+          items.push(value);
+          last_payable = value;
+        } else if (value.doctype === 'payment') {
+          console.log('  adding payment \'' + value._id + '\' to payable: ' + last_payable.name);
+          last_payable.payment = value;
+        }
       });
       res.json({ data: items });
     });
@@ -43,11 +74,13 @@
   });
 
   app.put('/api/put/line-item', jsonParser, function(req, res) {
-    if (!req.body) {
+    var item = req.body;
+    if (!item) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('PUT ' + req.body.name);
-    cashew_db.insert(req.body, function(err, body) {
+    console.log('PUT ' + item.name);
+    item.doctype = 'lineitem';
+    cashew_db.insert(item, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
         return;
