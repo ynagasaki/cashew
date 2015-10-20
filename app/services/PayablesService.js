@@ -23,13 +23,25 @@
       $http.put('/api/pay', payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
-          payable.payment = { id: payload.id, rev: payload.rev };
+          payable.payment = { '_id': payload.id, '_rev': payload.rev };
         } else {
           payable.payment = null;
         }
       }, function(result) {
         console.log('failed to pay ' + payable.name + ': ' + result.data);
         payable.payment = null;
+      });
+    };
+
+    serv.unpay = function(payable) {
+      var payment = payable.payment;
+      $http.delete('/api/delete/' + payment._id + '/' + payment._rev, payable).then(function(result) {
+        var payload = result.data.data;
+        if (payload.ok) {
+          payable.payment = null;
+        }
+      }, function(result) {
+        console.log('failed to unpay ' + payable.name + ': ' + result.data);
       });
     };
 

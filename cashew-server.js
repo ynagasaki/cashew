@@ -89,7 +89,7 @@
     });
   });
 
-  app.delete('/api/delete/line-item/:id/:rev', function(req, res) {
+  app.delete('/api/delete/:id/:rev', function(req, res) {
     console.log('DELETE ' + req.params.id + ' ' + req.params.rev);
     cashew_db.destroy(req.params.id, req.params.rev, function(err, body) {
       if (err) {

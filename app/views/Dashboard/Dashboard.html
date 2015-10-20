@@ -4,7 +4,7 @@
       <h2 style="text-transform: uppercase; color: #999; font-size: 10pt; margin: 0; padding: 0;">Upcoming Payables</h2>
     </div>
     <div class="upcoming_lineitems" ng-class="{'paid': item.payment}" ng-repeat="item in dash.payables | orderBy: ['year','month','day']">
-      <input type="checkbox" ng-checked="item.payment" ng-click="dash.pay(item)">
+      <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span style="font: 12pt sans-serif;">{{item.name}}</span>
       <span ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item.month).substring(0, 3)}} {{item.day}}</span>

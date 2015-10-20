@@ -87,8 +87,12 @@
         });
       });
     };
-    me.pay = function(payable) {
-      PayablesService.pay(payable);
+    me.togglePaid = function(payable) {
+      if (!payable.payment) {
+        PayablesService.pay(payable);
+      } else {
+        PayablesService.unpay(payable);
+      }
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);

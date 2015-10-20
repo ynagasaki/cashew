@@ -37,7 +37,7 @@
 
     serv.remove = function(item) {
       var me = this;
-      $http.delete('/api/delete/line-item/' + item._id + '/' + item._rev).then(function (result) {
+      $http.delete('/api/delete/' + item._id + '/' + item._rev).then(function (result) {
         if (result.data.data.ok) {
           var i = 0;
           for (; i < me.lineItems.length; ++i) {
