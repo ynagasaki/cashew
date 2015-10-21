@@ -1,0 +1,24 @@
+<div class="pure-g">
+  <div class="pure-u-1-3">
+    <line-item-adder></line-item-adder> 
+  </div>
+  <div class="pure-u-2-3">
+    <ul class="lineItems">
+      <li class="lineItem" ng-repeat="item in planner.lineItems">
+        <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
+        <span class="name">{{item.name}}</span> in the amount of 
+        <span class="amount">{{item.amount | currency}}</span> 
+        <span ng-show="item.freq">
+          every {{item.freq.per}} on 
+          <span ng-repeat="date in item.freq.on">
+            <span ng-show="date.M">{{date.M}}/</span>
+            <span>{{date.D}}</span>
+          </span>
+        </span>
+        <button type="button" class="pure-button showOnHover" ng-click="planner.removeLineItem(item)">
+          <i class="fa fa-trash-o"></i>
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>

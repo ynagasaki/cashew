@@ -135,7 +135,7 @@ span.due_label {
 }
 #calendar td.out_of_range {
   background-color: #eee;
-  color: #bbb;
+  color: #999;
 }
 #calendar .month_label {
   text-transform: uppercase;

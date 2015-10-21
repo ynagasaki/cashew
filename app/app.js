@@ -8,13 +8,13 @@
     'cashewApp.view2',
     'cashewApp.Dashboard',
     'cashewApp.LineItemAdder',
-    'cashewApp.LineItemLister',
+    'cashewApp.Planner',
     'cashewApp.version',
     'cashewApp.services'
   ])
 
   .config(['$routeProvider', function($routeProvider) {
-    $routeProvider.otherwise({redirectTo: '/line-items'});
+    $routeProvider.otherwise({redirectTo: '/plan'});
   }]);
 
 })();
