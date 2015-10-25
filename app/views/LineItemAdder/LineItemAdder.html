@@ -1,49 +1,64 @@
 <form class="pure-form" ng-submit="adder.addItem()" name="itemAdder" id="itemAdder">
-  <fieldset>
-    <div class="field">
-      <input name="name" ng-model="adder.lineItem.name" ng-model-options="{ debounce: 200 }" type="text" placeholder="New line item..." required>
+  <div class="field">
+    <div style="display: inline-block;">
+      <button type="button" class="pure-button" ng-class="{'pure-button-active' : adder.lineItem.type === 'minus'}" style="border: 1px solid #ccc; border-bottom-right-radius: 0px; border-top-right-radius: 0px;" ng-click="adder.lineItem.type = 'minus'">
+        Payable
+      </button><button type="button" class="pure-button"  ng-class="{'pure-button-active' : adder.lineItem.type === 'plus'}" style="border: 1px solid #ccc; border-left: 0; border-bottom-left-radius: 0px; border-top-left-radius: 0px;" ng-click="adder.lineItem.type = 'plus'">
+        Earnable
+      </button>
     </div>
-    <div class="field">
-      <input name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="-?[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
+    <span class="tip">Type of line item?</span>
+    <span class="tip" ng-show="adder.lineItem.type === 'plus'" style="clear: both; color: #ddd;">(Aww yeahh)</span>
+  </div>
+  <div class="field">
+    <input name="name" ng-model="adder.lineItem.name" ng-model-options="{ debounce: 200 }" placeholder="Item name..." type="text" required>
+    <label for="name" class="tip">Give it a name</label>
+  </div>
+  <div class="field">
+    <input name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
+    <label for="amt" class="tip">Amount to <span ng-show="adder.lineItem.type === 'minus'">pay</span><span ng-show="adder.lineItem.type === 'plus'">earn</span></label>
+  </div>
+  <div class="field">
+    <div style="display: inline-block;">
+      <button type="button" class="pure-button" ng-class="{'pure-button-active' : adder.lineItem.period === 'mo'}" style="border: 1px solid #ccc; border-bottom-right-radius: 0px; border-top-right-radius: 0px;" ng-click="adder.lineItem.period = 'mo'">
+        Monthly
+      </button><button type="button" class="pure-button" ng-class="{'pure-button-active' : adder.lineItem.period === 'yr'}" style="border: 1px solid #ccc; border-left: 0; border-bottom-left-radius: 0px; border-top-left-radius: 0px;" ng-click="adder.lineItem.period = 'yr'">
+        Yearly
+      </button>
     </div>
-    <span>occurs</span>
-    <select ng-model="adder.lineItem.period">
-      <option value="once">once</option>
-      <option value="mo">monthly</option>
-      <option value="yr">yearly</option>
-    </select>
-  </fieldset>
-  <div ng-show="adder.lineItem.period!=='once'">
-    <fieldset ng-repeat="date in adder.lineItem.dates" class="dates">
-      <div class="field">
-        <span ng-show="$index>0">and </span><span>on</span>
-        <select ng-show="adder.lineItem.period==='yr'" ng-model="date.M">
-          <option value="1">Jan</option>
-          <option value="2">Feb</option>
-          <option value="3">Mar</option>
-          <option value="4">Apr</option>
-          <option value="5">May</option>
-          <option value="6">Jun</option>
-          <option value="7">Jul</option>
-          <option value="8">Aug</option>
-          <option value="9">Sep</option>
-          <option value="10">Oct</option>
-          <option value="11">Nov</option>
-          <option value="12">Dec</option>
-        </select>
-        <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D" ng-model-options="{ debounce: 200 }">
-      </div>
-    </fieldset>
-    <button type="button" class="pure-button" ng-click="adder.addDateToLineItem()" ng-disabled="!adder.allowAddingDate()">
-      <i class="fa fa-plus"></i>
+    <span class="tip">How often?</span>
+  </div>
+  <div class="field">
+    <span class="tip" style="z-index: 100;">On which date<span ng-show="adder.lineItem.dates.length > 1">s</span>?</span>
+    <div ng-repeat="date in adder.lineItem.dates" class="dates removable" ng-class="{'last_date' : $last}">
+      <span ng-show="$index>0">and </span><span>on</span>
+      <select ng-show="adder.lineItem.period==='yr'" ng-model="date.M">
+        <option value="1">Jan</option>
+        <option value="2">Feb</option>
+        <option value="3">Mar</option>
+        <option value="4">Apr</option>
+        <option value="5">May</option>
+        <option value="6">Jun</option>
+        <option value="7">Jul</option>
+        <option value="8">Aug</option>
+        <option value="9">Sep</option>
+        <option value="10">Oct</option>
+        <option value="11">Nov</option>
+        <option value="12">Dec</option>
+      </select>
+      <input class="num_short" type="number" placeholder="day" min="1" max="31" ng-model="date.D" ng-model-options="{ debounce: 200 }">
+      <button type="button" class="pure-button showOnHover" ng-click="adder.removeDateFromLineItem(date)" ng-hide="$index===0">
+        <i class="fa fa-trash-o"></i>
+      </button>
+    </div>
+    <button type="button" class="pure-button" ng-click="adder.addDateToLineItem()" ng-show="adder.allowAddingDate()" style="margin-top: 10px;">
+      <i class="fa fa-plus"></i> Add date
     </button>
   </div>
-  <span name="instructions" class="fake_button" ng-hide="getErrorMessage(adder.lineItem)===null">
-    <i class="fa fa-question-circle"></i>
-    {{getErrorMessage(adder.lineItem)}}
-  </span>
-  <button class="fake_button valid_button" ng-show="getErrorMessage(adder.lineItem)===null">
-    <i class="fa fa-check-circle"></i>
-    Add line item.
-  </button>
+  <div style="padding: 10px;">
+    <button class="pure-button pure-button-primary" ng-class="{'pure-button-disabled': getErrorMessage(adder.lineItem)!==null}">
+      <!-- i class="fa fa-check-circle"></i -->
+      Save
+    </button>
+  </div>
 </form>

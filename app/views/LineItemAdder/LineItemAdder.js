@@ -14,8 +14,25 @@
 
   .controller('LineItemAdder', ['$scope', 'LineItemsService', function($scope, LineItemsService) {
     var me = this;
+    var an_id = 0;
 
-    me.lineItem = { period: 'mo', dates: [{}] };
+    var getNextId = function() {
+      return ++an_id;
+    };
+
+    var newLineItemDate = function() {
+      return {M:null,D:null,'?':getNextId()};
+    };
+
+    var newLineItem = function() {
+      var item = {};
+      item.period = 'mo';
+      item.type = 'minus';
+      item.dates = [newLineItemDate()];
+      return item;
+    };
+
+    me.lineItem = newLineItem();
 
     $scope.isInvalidDate = function(d) {
       if (d.M) {
@@ -75,10 +92,15 @@
     };
 
     me.addItem = function() {
-      var item = {};
-      
+      var item;
+
+      if ($scope.getErrorMessage(me.lineItem) !== null) {
+        return;
+      }
+
+      item = {};
       item.name = me.lineItem.name;
-      item.type = me.lineItem.amount < 0 ? 'minus' : 'plus';
+      item.type = me.lineItem.type;
       item.amount = Math.abs(me.lineItem.amount);
       item.recurs = me.lineItem.period !== 'once';
       if (item.recurs) {
@@ -99,7 +121,7 @@
 
       LineItemsService.put(item);
 
-      me.lineItem = { period: 'mo', dates: [{}] };
+      me.lineItem = newLineItem();
     };
 
     me.allowAddingDate = function() {
@@ -123,7 +145,16 @@
     };
 
     me.addDateToLineItem = function() {
-      me.lineItem.dates.push({});
+      me.lineItem.dates.push(newLineItemDate());
+    };
+
+    me.removeDateFromLineItem = function(d) {
+      me.lineItem.dates.forEach(function(elem, i, arr) {
+        if (elem['?'] === d['?']) {
+          arr.splice(i, 1);
+          return;
+        }
+      });
     };
   }]);
 })();
