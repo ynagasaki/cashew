@@ -33,6 +33,7 @@
       "December"
     ];
 
+    me.asides = [];
     me.payables = [];
     me.datesArray = (function(start, weeks) {
       var offset = start.getDay();
@@ -79,9 +80,11 @@
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
+        /* Yearly payables not due this month or next will be considered for "set-aside" logic and not added to upcoming payables. */
         if (item.month) {
           var itemJsMonth = item.month - 1;
           if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
+            me.calculateSetAside(item);
             return;
           }
         }
@@ -94,6 +97,14 @@
           year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
           payment: (!item.payment) ? null : item.payment
         });
+      });
+    };
+    me.calculateSetAside = function(item) {
+      me.asides.push({
+        name: item.name,
+        amount: item.amount / 12,
+        day: item.day,
+        month: item.month
       });
     };
     me.togglePaid = function(payable) {

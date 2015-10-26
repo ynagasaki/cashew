@@ -9,6 +9,11 @@
     </div>
 
     <h2 class="section-header">Monthly Set-Asides</h2>
+    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: ['month','day']">
+      <span style="font: 12pt sans-serif;">{{item.name}}</span>
+      <span class="amount_label">{{item.amount | currency}}</span>
+      <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
+    </div>
   </div>
   <div class="pure-u-2-3">
     <table id="calendar" class="pure-table pure-table-bordered">

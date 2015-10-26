@@ -1,5 +1,4 @@
 .cashew-nav {
-  background-color: #EEE;
 }
 .cashew-brand {
   margin-left: 10px;
@@ -27,6 +26,7 @@ h2.section-header {
   margin: 0;
   padding: 10px;
   border-bottom: solid 1px #DEDEDE;
+  background-color: #f5f5f5;
 }
 .lineItem {
   padding: 10px;
