@@ -102,22 +102,17 @@
       item.name = me.lineItem.name;
       item.type = me.lineItem.type;
       item.amount = Math.abs(me.lineItem.amount);
-      item.recurs = me.lineItem.period !== 'once';
-      if (item.recurs) {
-        item.freq = {};
-        item.freq.per = me.lineItem.period;
-        item.freq.on = [];
-        me.lineItem.dates.forEach(function(date) {
-          var on = {};
-          if (item.freq.per === 'yr' && date.M) {
-            on.M = parseInt(date.M);
-          }
-          on.D = date.D;
-          item.freq.on.push(on);
-        });
-      } else {
-        item.freq = null;
-      }
+      item.freq = {};
+      item.freq.per = me.lineItem.period;
+      item.freq.on = [];
+      me.lineItem.dates.forEach(function(date) {
+        var on = {};
+        if (item.freq.per === 'yr' && date.M) {
+          on.M = parseInt(date.M);
+        }
+        on.D = date.D;
+        item.freq.on.push(on);
+      });
 
       LineItemsService.put(item);
 

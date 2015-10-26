@@ -6,22 +6,20 @@
     <line-item-adder></line-item-adder> 
   </div>
   <div class="pure-u-2-3">
-    <ul class="lineItems">
-      <li class="lineItem removable" ng-repeat="item in planner.lineItems">
-        <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
-        <span class="name">{{item.name}}</span> in the amount of 
-        <span class="amount">{{item.amount | currency}}</span> 
-        <span ng-show="item.freq">
-          every {{item.freq.per}} on 
-          <span ng-repeat="date in item.freq.on">
-            <span ng-show="date.M">{{date.M}}/</span>
-            <span>{{date.D}}</span>
-          </span>
+    <div class="lineItem removable" ng-repeat="item in planner.lineItems">
+      <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
+      <span class="name">{{item.name}}</span> in the amount of 
+      <span class="amount">{{item.amount | currency}}</span> 
+      <span ng-show="item.freq">
+        every {{item.freq.per}} on 
+        <span ng-repeat="date in item.freq.on">
+          <span ng-show="date.M">{{date.M}}/</span>
+          <span>{{date.D}}</span>
         </span>
-        <button type="button" class="pure-button showOnHover" ng-click="planner.removeLineItem(item)">
-          <i class="fa fa-trash-o"></i>
-        </button>
-      </li>
-    </ul>
+      </span>
+      <button type="button" class="pure-button showOnHover" ng-click="planner.removeLineItem(item)">
+        <i class="fa fa-trash-o"></i>
+      </button>
+    </div>
   </div>
 </div>
