@@ -19,7 +19,7 @@ describe('my app', function() {
 
 
     it('should render view1 when user navigates to /view1', function() {
-      expect(element.all(by.css('[ng-view] ul')).first().getText()).toBeDefined();
+      expect(element.all(by.css('[ng-view] div')).first().getText()).toBeDefined();
     });
 
   });

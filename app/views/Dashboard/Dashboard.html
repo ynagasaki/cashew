@@ -1,14 +1,14 @@
 <div class="pure-g">
   <div class="pure-u-1-3">
-    <div class="section-header">
-      <h2>Upcoming Payables</h2>
-    </div>
+    <h2 class="section-header">Upcoming Payables</h2>
     <div class="upcoming_lineitems" ng-class="{'paid': item.payment}" ng-repeat="item in dash.payables | orderBy: ['year','month','day']">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span style="font: 12pt sans-serif;">{{item.name}}</span>
       <span ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
-      <span class="due_label">{{dash.getMonthName(item.month).substring(0, 3)}} {{item.day}}</span>
+      <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
     </div>
+
+    <h2 class="section-header">Monthly Set-Asides</h2>
   </div>
   <div class="pure-u-2-3">
     <table id="calendar" class="pure-table pure-table-bordered">

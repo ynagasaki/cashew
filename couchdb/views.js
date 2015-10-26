@@ -11,14 +11,21 @@
     },
     'payables': {
       map: function(doc) {
-        if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq && doc.freq.per === 'mo') {
+        var payable;
+        var date;
+        if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq) {
           for (var i = 0; i < doc.freq.on.length; ++i) {
-            emit([doc._id, 0], {
+            date = doc.freq.on[i];
+            payable = {
               doctype: 'payable',
               name: doc.name,
               amount: doc.amount,
-              day: doc.freq.on[i].D
-            });
+              day: date.D
+            };
+            if (date.M) {
+              payable.month = date.M;
+            }
+            emit([doc._id, 0], payable);
           }
         } else if (doc.doctype === 'payment') {
           emit([doc.lineitem_id, 1], doc);

@@ -16,8 +16,8 @@
     var me = this;
     var now = new Date();
     var currDay = now.getDate();
-    var currMonth = now.getMonth();
-    var nextMonth = (currMonth + 1) % 12;
+    var currJsMonth = now.getMonth();
+    var nextJsMonth = (currJsMonth + 1) % 12;
     var monthNames = [
       "January",
       "February",
@@ -56,33 +56,42 @@
 
     me.payablesOn = function(d) {
       var result = [];
+      var date = d.getDate();
+      var month = d.getMonth() + 1;
+      var year = d.getFullYear();
       me.payables.forEach(function(p) {
-        if(p.day === d.getDate() && p.month === d.getMonth() && p.year === d.getFullYear()) {
+        if(p.day === date && p.month === month && p.year === year) {
           result.push(p);
         }
       });
       return result;
     };
     me.isToday = function(date) {
-      return currDay === date.getDate() && currMonth === date.getMonth() && now.getFullYear() === date.getFullYear();
+      return currDay === date.getDate() && currJsMonth === date.getMonth() && now.getFullYear() === date.getFullYear();
     };
-    me.getMonthName = function(mo) {
-      return monthNames[mo];
+    me.getMonthName = function(item) {
+      return monthNames[item.month - 1];
     };
     me.isOutOfRange = function(date) {
       var mo = date.getMonth();
       var dt = date.getDate();
-      return (mo > currMonth && dt >= currDay) || (mo <= currMonth && dt < currDay);
+      return (mo > currJsMonth && dt >= currDay) || (mo <= currJsMonth && dt < currDay);
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
-        me.payables.push({ 
+        if (item.month) {
+          var itemJsMonth = item.month - 1;
+          if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
+            return;
+          }
+        }
+        me.payables.push({
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
           day: item.day,
-          month: (item.day >= currDay) ? currMonth : nextMonth,
-          year: (nextMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
+          month: (item.month) ? item.month : ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1,
+          year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
           payment: (!item.payment) ? null : item.payment
         });
       });
