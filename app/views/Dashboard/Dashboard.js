@@ -53,7 +53,7 @@
         arr.push(week);
       }
       return arr;
-    })(new Date(), 5);
+    })(now, 5);
 
     me.payablesOn = function(d) {
       var result = [];
@@ -79,23 +79,30 @@
       return (mo > currJsMonth && dt >= currDay) || (mo <= currJsMonth && dt < currDay);
     };
     me.updatePayables = function () {
+      var itemJsMonth;
+      var payableMonth;
       PayablesService.payables.forEach(function(item) {
-        /* Yearly payables not due this month or next will be considered for "set-aside" logic and not added to upcoming payables. */
         if (item.month) {
-          var itemJsMonth = item.month - 1;
+          /* yearly payable logic */
+          itemJsMonth = item.month - 1;
           if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
+            /* if not due this month or next month, then consider for "set-aside" logic */
             me.calculateSetAside(item);
+            /* and don't add to upcoming payables list */
             return;
           }
+          payableMonth = item.month;
+        } else {
+          payableMonth = ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
         }
         me.payables.push({
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
           day: item.day,
-          month: (item.month) ? item.month : ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1,
+          month: payableMonth,
           year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
-          payment: (!item.payment) ? null : item.payment
+          payment: (!item.payment || item.payment.month != payableMonth) ? null : item.payment
         });
       });
     };
