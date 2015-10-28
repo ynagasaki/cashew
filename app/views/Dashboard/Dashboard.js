@@ -102,7 +102,7 @@
           day: item.day,
           month: payableMonth,
           year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
-          payment: (!item.payment || item.payment.month != payableMonth) ? null : item.payment
+          payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
         });
       });
     };
