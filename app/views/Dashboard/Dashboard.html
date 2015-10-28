@@ -9,9 +9,10 @@
     </div>
 
     <h2 class="section-header">Monthly Set-Asides</h2>
-    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: ['month','day']">
+    <div class="upcoming_lineitems" ng-class="{'paid': item.payment}" ng-repeat="item in dash.asides | orderBy: ['month','day']">
+      <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaidAside(item)">
       <span style="font: 12pt sans-serif;">{{item.name}}</span>
-      <span class="amount_label">{{item.amount | currency}}</span>
+      <span ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
     </div>
   </div>

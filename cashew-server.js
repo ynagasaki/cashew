@@ -26,6 +26,7 @@
     payment.day = payable.day;
     payment.month = payable.month;
     payment.year = payable.year;
+    payment.amount = payable.amount;
     cashew_db.insert(payment, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
@@ -51,8 +52,18 @@
           items.push(value);
           last_payable = value;
         } else if (value.doctype === 'payment') {
-          console.log('  adding payment \'' + value._id + '\' to payable: ' + last_payable.name);
-          last_payable.payment = value;
+          if (last_payable.month) {
+            /* handle yearly payable */
+            console.log('    prepending payment \'' + value._id + '\' to yearly payable: ' + last_payable.name);
+            if (!last_payable.payments) {
+              last_payable.payments = [];
+            }
+            last_payable.payments.unshift(value);
+          } else {
+            /* handle monthly payable */
+            console.log('    adding payment \'' + value._id + '\' to monthly payable: ' + last_payable.name);
+            last_payable.payment = value;
+          }
         }
       });
       res.json({ data: items });

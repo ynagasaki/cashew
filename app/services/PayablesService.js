@@ -19,7 +19,7 @@
       });
     };
 
-    serv.pay = function(payable) {
+    serv.pay = function(payable, then) {
       $http.put('/api/pay', payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
@@ -27,21 +27,33 @@
         } else {
           payable.payment = null;
         }
+        if (then) {
+          then(payable);
+        }
       }, function(result) {
         console.log('failed to pay ' + payable.name + ': ' + result.data);
         payable.payment = null;
+        if (then) {
+          then(payable);
+        }
       });
     };
 
-    serv.unpay = function(payable) {
+    serv.unpay = function(payable, then) {
       var payment = payable.payment;
       $http.delete('/api/delete/' + payment._id + '/' + payment._rev, payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
           payable.payment = null;
         }
+        if (then) {
+          then(payable);
+        }
       }, function(result) {
         console.log('failed to unpay ' + payable.name + ': ' + result.data);
+        if (then) {
+          then(payable);
+        }
       });
     };
 

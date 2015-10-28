@@ -107,11 +107,16 @@
       });
     };
     me.calculateSetAside = function(item) {
+      var no_payments = !item.payments || item.payments.length === 0;
       me.asides.push({
+        lineitem_id: item.lineitem_id,
         name: item.name,
         amount: item.amount / 12,
         day: item.day,
-        month: item.month
+        month: item.month,
+        year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
+        payments: no_payments ? null : item.payments,
+        payment: no_payments ? null : item.payments[0]
       });
     };
     me.togglePaid = function(payable) {
@@ -119,6 +124,24 @@
         PayablesService.pay(payable);
       } else {
         PayablesService.unpay(payable);
+      }
+    };
+    me.togglePaidAside = function(aside) {
+      if (!aside.payments) {
+        aside.payments = [];
+      }
+      if (!aside.payment) {
+        PayablesService.pay(aside, function(payable) {
+          if (payable.payment) {
+            payable.payments.unshift(payable.payment);
+          }
+        });
+      } else {
+        PayablesService.unpay(aside, function(payable) {
+          if (payable.payment === null) {
+            payable.payments.shift();
+          }
+        });
       }
     };
 
