@@ -144,6 +144,17 @@
         });
       }
     };
+    me.getPercentComplete = function(aside) {
+      if (!aside.payments || aside.payments.length === 0) {
+        return 0.0;
+      }
+      var sum = 0;
+      var total = aside.amount * 12;
+      aside.payments.forEach(function(elem) {
+        sum += elem.amount;
+      });
+      return parseInt(sum / total * 100).toString() + '%';
+    }
 
     $scope.$on('payables.refreshed', me.updatePayables);
 
