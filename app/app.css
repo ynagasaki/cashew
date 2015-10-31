@@ -110,7 +110,7 @@ div.upcoming_lineitems {
   padding: 10px 10px 10px 10px;
   border-bottom: solid 1px #DEDEDE;
 }
-div.paid {
+.paid {
   text-decoration: line-through;
   text-decoration-color: #888;
   color: #ccc;
@@ -135,6 +135,21 @@ span.due_label {
   margin: 0;
   float: right;
   color: #777;
+}
+div.progress-bar {
+  display: inline-block;
+  text-decoration: none;
+  width: 100px; 
+  border-radius: 3px;
+  border: solid 1px #FFD859;
+}
+div.progress {
+  background-color: #FFEDC2; /* #FFF2D9 */
+  color: #F29500;
+  font: 11pt sans-serif;
+  border-radius: 3px;
+  min-width: 1.5em;
+  padding: 3px;
 }
 /* Calendar widget */
 #calendar {
