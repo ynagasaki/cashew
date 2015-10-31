@@ -58,7 +58,7 @@
     /* Determines the intended pay/due month for the passed payable item */
     me.getPayableMonth = function(item) {
       return ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
-    }
+    };
     me.payablesOn = function(d) {
       var result = [];
       var date = d.getDate();
@@ -180,7 +180,7 @@
         return item.amount - sum;
       }
       return item.amount;
-    }
+    };
 
     $scope.$on('payables.refreshed', me.updatePayables);
 

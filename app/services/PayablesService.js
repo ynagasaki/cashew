@@ -32,8 +32,8 @@
       $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
-          payment['_id'] = payload.id;
-          payment['_rev'] = payload.rev;
+          payment._id = payload.id;
+          payment._rev = payload.rev;
           payable.payment = payment;
         } else {
           payable.payment = null;
