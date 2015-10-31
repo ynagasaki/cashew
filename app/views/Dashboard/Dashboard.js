@@ -84,6 +84,9 @@
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
+        var payableMonth;
+        var payable;
+
         if (item.month) {
           /* yearly payable logic */
           var itemJsMonth = item.month - 1;
@@ -94,8 +97,9 @@
             return;
           }
         }
-        var payableMonth = me.getPayableMonth(item);
-        me.payables.push({
+        
+        payableMonth = me.getPayableMonth(item);
+        payable = {
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
@@ -103,7 +107,20 @@
           month: payableMonth,
           year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
           payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
-        });
+        };
+
+        if (item.month) {
+          payable.payments = [];
+          /*TODO: filter out older payments at the DB query level*/
+          item.payments.forEach(function(past_payment) {
+            if (past_payment.year >= payable.year - 1) {
+              payable.payments.push(past_payment);
+            }
+          });
+          /*TODO: these might not be sorted correctly.*/
+        }
+
+        me.payables.push(payable);
       });
     };
     me.calculateSetAside = function(item) {
@@ -154,6 +171,16 @@
       });
       return parseInt(sum / total * 100);
     };
+    me.getItemAmount = function(item) {
+      if (item.payments) {
+        var sum = 0;
+        item.payments.forEach(function(entry) {
+          sum += entry.amount;
+        });
+        return item.amount - sum;
+      }
+      return item.amount;
+    }
 
     $scope.$on('payables.refreshed', me.updatePayables);
 

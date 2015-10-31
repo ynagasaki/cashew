@@ -4,7 +4,10 @@
     <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: ['year','month','day']">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
-      <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
+      <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">
+        {{dash.getItemAmount(item) | currency}}
+        <span style="color: #FFBFCB; border-left: 1px solid #FFBFCB; padding-left: 5px;" ng-show="item.payments">{{item.amount | currency}}</span>
+      </span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
     </div>
 
@@ -41,7 +44,9 @@
               <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
               <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
             </span>
-            <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
+            <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
+              {{dash.getItemAmount(item) | currency}}
+            </span>
           </td>
         </tr>
       </tbody>
