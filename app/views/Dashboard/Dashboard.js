@@ -121,7 +121,7 @@
     };
     me.togglePaid = function(payable) {
       if (!payable.payment) {
-        PayablesService.pay(payable);
+        PayablesService.pay(payable, now);
       } else {
         PayablesService.unpay(payable);
       }
@@ -131,7 +131,7 @@
         aside.payments = [];
       }
       if (!aside.payment) {
-        PayablesService.pay(aside, function(payable) {
+        PayablesService.pay(aside, now, function(payable) {
           if (payable.payment) {
             payable.payments.unshift(payable.payment);
           }
