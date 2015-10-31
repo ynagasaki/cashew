@@ -19,7 +19,7 @@
       });
     };
 
-    serv.pay = function(payable, date, then) {
+    serv.pay = function(payable, then) {
       /* Create a payment based on this payable */
       var payment = {};
       payment.lineitem_id = payable.lineitem_id;

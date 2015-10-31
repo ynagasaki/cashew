@@ -4,7 +4,7 @@
     <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: ['year','month','day']">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
-      <span ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
+      <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
     </div>
 
@@ -12,7 +12,7 @@
     <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: ['month','day']">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaidAside(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
-      <span ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
+      <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
       <div class="progress-bar">
         <div class="progress" ng-class="{'no-bg-color': dash.getPercentComplete(item)===0}" ng-style="{'width': dash.getPercentComplete(item) + '%'}">
