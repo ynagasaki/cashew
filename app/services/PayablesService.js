@@ -20,12 +20,24 @@
     };
 
     serv.pay = function(payable, then) {
-      $http.put('/api/pay', payable).then(function(result) {
+      /* Create a payment based on this payable */
+      var payment = {};
+      payment.lineitem_id = payable.lineitem_id;
+      payment.doctype = 'payment';
+      payment.day = payable.day;
+      payment.month = payable.month;
+      payment.year = payable.year;
+      payment.amount = payable.amount;
+      /* Post payment */
+      $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
-          payable.payment = { '_id': payload.id, '_rev': payload.rev, 'amount': payable.amount /* This is just a hack; fix later */ };
+          payment._id = payload.id;
+          payment._rev = payload.rev;
+          payable.payment = payment;
         } else {
           payable.payment = null;
+          console.log('failed to pay ' + payable.name + ': ' + result.data);
         }
         if (then) {
           then(payable);

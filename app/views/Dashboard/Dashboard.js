@@ -14,7 +14,7 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = new Date();
+    var now = new Date(2016,0,1,0,0,0,0);
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
     var nextJsMonth = (currJsMonth + 1) % 12;
@@ -55,6 +55,10 @@
       return arr;
     })(now, 5);
 
+    /* Determines the intended pay/due month for the passed payable item */
+    me.getPayableMonth = function(item) {
+      return ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
+    };
     me.payablesOn = function(d) {
       var result = [];
       var date = d.getDate();
@@ -79,23 +83,23 @@
       return (mo > currJsMonth && dt >= currDay) || (mo <= currJsMonth && dt < currDay);
     };
     me.updatePayables = function () {
-      var itemJsMonth;
-      var payableMonth;
       PayablesService.payables.forEach(function(item) {
+        var payableMonth;
+        var payable;
+
         if (item.month) {
           /* yearly payable logic */
-          itemJsMonth = item.month - 1;
+          var itemJsMonth = item.month - 1;
           if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
             /* if not due this month or next month, then consider for "set-aside" logic */
             me.calculateSetAside(item);
             /* and don't add to upcoming payables list */
             return;
           }
-          payableMonth = item.month;
-        } else {
-          payableMonth = ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
         }
-        me.payables.push({
+        
+        payableMonth = me.getPayableMonth(item);
+        payable = {
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
@@ -103,7 +107,20 @@
           month: payableMonth,
           year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
           payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
-        });
+        };
+
+        if (item.month) {
+          payable.payments = [];
+          /*TODO: filter out older payments at the DB query level*/
+          item.payments.forEach(function(past_payment) {
+            if (past_payment.year >= payable.year - 1) {
+              payable.payments.push(past_payment);
+            }
+          });
+          /*TODO: these might not be sorted correctly.*/
+        }
+
+        me.payables.push(payable);
       });
     };
     me.calculateSetAside = function(item) {
@@ -112,8 +129,7 @@
         lineitem_id: item.lineitem_id,
         name: item.name,
         amount: item.amount / 12,
-        day: item.day,
-        month: item.month,
+        month: me.getPayableMonth(item),
         year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
         payments: no_payments ? null : item.payments,
         payment: no_payments ? null : item.payments[0]
@@ -154,6 +170,16 @@
         sum += elem.amount;
       });
       return parseInt(sum / total * 100);
+    };
+    me.getItemAmount = function(item) {
+      if (item.payments) {
+        var sum = 0;
+        item.payments.forEach(function(entry) {
+          sum += entry.amount;
+        });
+        return item.amount - sum;
+      }
+      return item.amount;
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);

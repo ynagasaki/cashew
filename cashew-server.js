@@ -15,19 +15,11 @@
   });
 
   app.put('/api/pay', jsonParser, function(req, res) {
-    var payable = req.body;
-    var payment = {};
-    if (!payable) {
+    var payment = req.body;
+    if (!payment) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('pay: ' + payable.name);
-    /* This should really be in the PayablesService code, or something */
-    payment.lineitem_id = payable.lineitem_id;
-    payment.doctype = 'payment';
-    payment.day = payable.day;
-    payment.month = payable.month;
-    payment.year = payable.year;
-    payment.amount = payable.amount;
+    console.log('pay: ' + payment.lineitem_id);
     cashew_db.insert(payment, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
