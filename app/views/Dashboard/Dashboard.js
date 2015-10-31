@@ -153,8 +153,8 @@
       aside.payments.forEach(function(elem) {
         sum += elem.amount;
       });
-      return parseInt(sum / total * 100).toString() + '%';
-    }
+      return parseInt(sum / total * 100);
+    };
 
     $scope.$on('payables.refreshed', me.updatePayables);
 

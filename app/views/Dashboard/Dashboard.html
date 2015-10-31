@@ -15,8 +15,8 @@
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
       <div class="progress-bar">
-        <div class="progress" ng-style="{'width': dash.getPercentComplete(item)}">
-          {{dash.getPercentComplete(item)}}
+        <div class="progress" ng-class="{'no-bg-color': dash.getPercentComplete(item)===0}" ng-style="{'width': dash.getPercentComplete(item) + '%'}">
+          {{dash.getPercentComplete(item)}}%
         </div>
       </div>
     </div>

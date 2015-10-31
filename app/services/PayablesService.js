@@ -23,7 +23,7 @@
       $http.put('/api/pay', payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
-          payable.payment = { '_id': payload.id, '_rev': payload.rev };
+          payable.payment = { '_id': payload.id, '_rev': payload.rev, 'amount': payable.amount /* This is just a hack; fix later */ };
         } else {
           payable.payment = null;
         }

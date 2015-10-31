@@ -21,6 +21,7 @@
       return res.status(400).json({ msg: 'error: no body' });
     }
     console.log('pay: ' + payable.name);
+    /* This should really be in the PayablesService code, or something */
     payment.lineitem_id = payable.lineitem_id;
     payment.doctype = 'payment';
     payment.day = payable.day;

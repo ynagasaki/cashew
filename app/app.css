@@ -139,7 +139,7 @@ span.due_label {
 div.progress-bar {
   display: inline-block;
   text-decoration: none;
-  width: 100px; 
+  width: 80px; 
   border-radius: 3px;
   border: solid 1px #FFD859;
 }
@@ -150,6 +150,9 @@ div.progress {
   border-radius: 3px;
   min-width: 1.5em;
   padding: 3px;
+}
+div.no-bg-color {
+  background-color: transparent;
 }
 /* Calendar widget */
 #calendar {
