@@ -20,6 +20,7 @@
     };
 
     serv.pay = function(payable, then) {
+      var sum;
       /* Create a payment based on this payable */
       var payment = {};
       payment.lineitem_id = payable.lineitem_id;
@@ -28,6 +29,13 @@
       payment.month = payable.month;
       payment.year = payable.year;
       payment.amount = payable.amount;
+      if (payable.payments) {
+        sum = 0;
+        payable.payments.forEach(function(entry) {
+          sum += entry.amount;
+        });
+        payment.amount -= sum;
+      }
       /* Post payment */
       $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;

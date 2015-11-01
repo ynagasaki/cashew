@@ -17,6 +17,7 @@
     var now = new Date(2016,0,1,0,0,0,0);
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
+    var currYear = now.getFullYear();
     var nextJsMonth = (currJsMonth + 1) % 12;
     var monthNames = [
       "January",
@@ -72,7 +73,7 @@
       return result;
     };
     me.isToday = function(date) {
-      return currDay === date.getDate() && currJsMonth === date.getMonth() && now.getFullYear() === date.getFullYear();
+      return currDay === date.getDate() && currJsMonth === date.getMonth() && currYear === date.getFullYear();
     };
     me.getMonthName = function(item) {
       return monthNames[item.month - 1];
@@ -105,11 +106,11 @@
           amount: item.amount,
           day: item.day,
           month: payableMonth,
-          year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
+          year: (nextJsMonth === 0) ? currYear + 1 : currYear,
           payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
         };
 
-        if (item.month) {
+        if (item.month && item.payments && item.payments.length > 0) {
           payable.payments = [];
           /*TODO: filter out older payments at the DB query level*/
           item.payments.forEach(function(past_payment) {
@@ -118,6 +119,9 @@
             }
           });
           /*TODO: these might not be sorted correctly.*/
+          if (payable.payments[0].month === payableMonth && payable.payments[0].year === currYear) {
+            payable.payment = payable.payments[0];
+          }
         }
 
         me.payables.push(payable);
@@ -130,35 +134,31 @@
         name: item.name,
         amount: item.amount / 12,
         month: me.getPayableMonth(item),
-        year: (nextJsMonth === 0) ? now.getFullYear() + 1 : now.getFullYear(),
+        year: (nextJsMonth === 0) ? currYear + 1 : currYear,
         payments: no_payments ? null : item.payments,
         payment: no_payments ? null : item.payments[0]
       });
     };
     me.togglePaid = function(payable) {
       if (!payable.payment) {
-        PayablesService.pay(payable);
+        PayablesService.pay(payable, function(result) {
+          if (result.payment && result.payments) {
+            result.payments.unshift(result.payment);
+          }
+        });
       } else {
-        PayablesService.unpay(payable);
+        PayablesService.unpay(payable, function(result) {
+          if (result.payment === null && result.payments) {
+            result.payments.shift();
+          }
+        });
       }
     };
     me.togglePaidAside = function(aside) {
       if (!aside.payments) {
         aside.payments = [];
       }
-      if (!aside.payment) {
-        PayablesService.pay(aside, function(payable) {
-          if (payable.payment) {
-            payable.payments.unshift(payable.payment);
-          }
-        });
-      } else {
-        PayablesService.unpay(aside, function(payable) {
-          if (payable.payment === null) {
-            payable.payments.shift();
-          }
-        });
-      }
+      me.togglePaid(aside);
     };
     me.getPercentComplete = function(aside) {
       if (!aside.payments || aside.payments.length === 0) {
@@ -172,6 +172,11 @@
       return parseInt(sum / total * 100);
     };
     me.getItemAmount = function(item) {
+      /* prefer to show the amount already paid for this period */
+      if (item.payment) {
+        return item.payment.amount;
+      }
+      /* if this payable has payments, show remaining amount */
       if (item.payments) {
         var sum = 0;
         item.payments.forEach(function(entry) {
@@ -179,6 +184,7 @@
         });
         return item.amount - sum;
       }
+      /* else just show the original amount */
       return item.amount;
     };
 
