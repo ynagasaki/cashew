@@ -14,7 +14,7 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = new Date(2016,0,1,0,0,0,0);
+    var now = new Date();
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
     var currYear = now.getFullYear();
@@ -85,7 +85,7 @@
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
-        var payableMonth;
+        var payableMonth = me.getPayableMonth(item);
         var payable;
 
         if (item.month) {
@@ -93,13 +93,12 @@
           var itemJsMonth = item.month - 1;
           if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
             /* if not due this month or next month, then consider for "set-aside" logic */
-            me.calculateSetAside(item);
+            me.calculateSetAside(item, payableMonth);
             /* and don't add to upcoming payables list */
             return;
           }
         }
         
-        payableMonth = me.getPayableMonth(item);
         payable = {
           lineitem_id: item.lineitem_id,
           name: item.name,
@@ -127,19 +126,23 @@
         me.payables.push(payable);
       });
     };
-    me.calculateSetAside = function(item) {
+    me.calculateSetAside = function(item, payableMonth) {
       var no_payments = !item.payments || item.payments.length === 0;
       me.asides.push({
         lineitem_id: item.lineitem_id,
+        is_aside: true,
         name: item.name,
         amount: item.amount / 12,
-        month: me.getPayableMonth(item),
+        month: payableMonth,
         year: (nextJsMonth === 0) ? currYear + 1 : currYear,
         payments: no_payments ? null : item.payments,
-        payment: no_payments ? null : item.payments[0]
+        payment: no_payments || item.payments[0].month !== payableMonth ? null : item.payments[0]
       });
     };
     me.togglePaid = function(payable) {
+      if (payable.is_aside && !payable.payments) {
+        payable.payments = [];
+      }
       if (!payable.payment) {
         PayablesService.pay(payable, function(result) {
           if (result.payment && result.payments) {
@@ -153,12 +156,6 @@
           }
         });
       }
-    };
-    me.togglePaidAside = function(aside) {
-      if (!aside.payments) {
-        aside.payments = [];
-      }
-      me.togglePaid(aside);
     };
     me.getPercentComplete = function(aside) {
       if (!aside.payments || aside.payments.length === 0) {

@@ -29,7 +29,7 @@
       payment.month = payable.month;
       payment.year = payable.year;
       payment.amount = payable.amount;
-      if (payable.payments) {
+      if (!payable.is_aside && payable.payments) {
         sum = 0;
         payable.payments.forEach(function(entry) {
           sum += entry.amount;

@@ -13,7 +13,7 @@
 
     <h2 class="section-header">Monthly Set-Asides</h2>
     <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: ['month','day']">
-      <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaidAside(item)">
+      <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
       <span class="due_label">{{dash.getMonthName(item).substring(0, 3)}} {{item.day}}</span>
