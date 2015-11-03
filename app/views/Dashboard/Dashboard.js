@@ -19,6 +19,7 @@
     var currJsMonth = now.getMonth();
     var currYear = now.getFullYear();
     var nextJsMonth = (currJsMonth + 1) % 12;
+    var lastJsMonth = (currJsMonth > 0) ? currJsMonth - 1 : 11;
     var monthNames = [
       "January",
       "February",
@@ -56,9 +57,13 @@
       return arr;
     })(now, 5);
 
-    /* Determines the intended pay/due month for the passed payable item */
+    /* determines intended pay/due month for passed payable */
     me.getPayableMonth = function(item) {
       return ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
+    };
+    /* determines intended pay/due year for passed payable */
+    me.getPayableYear = function(item) {
+      return (item.day < currDay && currJsMonth === 11) ? currYear + 1 : currYear;
     };
     me.payablesOn = function(d) {
       var result = [];
@@ -81,31 +86,31 @@
     me.isOutOfRange = function(date) {
       var mo = date.getMonth();
       var dt = date.getDate();
-      return (mo > currJsMonth && dt >= currDay) || (mo <= currJsMonth && dt < currDay);
+      return (mo === nextJsMonth && dt >= currDay) || mo === lastJsMonth || (mo === currJsMonth && dt < currDay);
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
         var payableMonth = me.getPayableMonth(item);
-        var payable;
+        var payableYear = me.getPayableYear(item);
 
         if (item.month) {
           /* yearly payable logic */
           var itemJsMonth = item.month - 1;
-          if (itemJsMonth !== currJsMonth && itemJsMonth !== nextJsMonth) {
+          if (itemJsMonth !== currJsMonth) {
             /* if not due this month or next month, then consider for "set-aside" logic */
-            me.calculateSetAside(item, payableMonth);
+            me.calculateSetAside(item, payableMonth, payableYear);
             /* and don't add to upcoming payables list */
             return;
           }
         }
-        
-        payable = {
+
+        var payable = {
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
           day: item.day,
           month: payableMonth,
-          year: (nextJsMonth === 0) ? currYear + 1 : currYear,
+          year: payableYear,
           payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
         };
 
@@ -126,7 +131,7 @@
         me.payables.push(payable);
       });
     };
-    me.calculateSetAside = function(item, payableMonth) {
+    me.calculateSetAside = function(item, payableMonth, payableYear) {
       var no_payments = !item.payments || item.payments.length === 0;
       me.asides.push({
         lineitem_id: item.lineitem_id,
@@ -134,7 +139,7 @@
         name: item.name,
         amount: item.amount / 12,
         month: payableMonth,
-        year: (nextJsMonth === 0) ? currYear + 1 : currYear,
+        year: payableYear,
         payments: no_payments ? null : item.payments,
         payment: no_payments || item.payments[0].month !== payableMonth ? null : item.payments[0]
       });
