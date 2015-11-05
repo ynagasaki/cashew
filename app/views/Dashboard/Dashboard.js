@@ -14,7 +14,7 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = new Date();
+    var now = new Date(2016,1,1,0,0,0,0);
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
     var currYear = now.getFullYear();
@@ -34,6 +34,27 @@
       "November",
       "December"
     ];
+
+    var getMonthlyInstanceMonth = function(item) {
+      /* the month for a monthly payable instance is the current month, unless we're showing the next month's instance */
+      return ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
+    };
+    var getMonthlyInstanceYear = function(item) {
+      /* the year for a monthly payable instance is the current year, unless we're showing next month's instance and next month is Jan */
+      return (item.day < currDay && currJsMonth === 11) ? currYear + 1 : currYear;
+    };
+    var getYearlyInstanceYear = function(item) {
+      /* the year for a yearly payable instance that occurs after this year's instance is of course next year */
+      return (item.month && currJsMonth > item.month - 1) ? currYear + 1 : currYear;
+    };
+    /* NB: getYearlyInstanceMonth is just the yearly payable item's "month" field */
+    var determinePayment = function(payable) {
+      if (payable.payments && payable.payments[0].month === payable.month && payable.payments[0].year === payable.year) {
+        payable.payment = payable.payments[0];
+      } else {
+        payable.payment = null;
+      }
+    };
 
     me.asides = [];
     me.payables = [];
@@ -57,14 +78,6 @@
       return arr;
     })(now, 5);
 
-    /* determines intended pay/due month for passed payable */
-    me.getPayableMonth = function(item) {
-      return ((item.day >= currDay) ? currJsMonth : nextJsMonth) + 1;
-    };
-    /* determines intended pay/due year for passed payable */
-    me.getPayableYear = function(item) {
-      return (item.day < currDay && currJsMonth === 11) ? currYear + 1 : currYear;
-    };
     me.payablesOn = function(d) {
       var result = [];
       var date = d.getDate();
@@ -81,6 +94,9 @@
       return currDay === date.getDate() && currJsMonth === date.getMonth() && currYear === date.getFullYear();
     };
     me.getMonthName = function(item) {
+      if (item.is_aside) {
+        return monthNames[item.orig_month - 1];
+      }
       return monthNames[item.month - 1];
     };
     me.isOutOfRange = function(date) {
@@ -90,58 +106,54 @@
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
-        var payableMonth = me.getPayableMonth(item);
-        var payableYear = me.getPayableYear(item);
-
-        if (item.month) {
-          /* yearly payable logic */
-          var itemJsMonth = item.month - 1;
-          if (itemJsMonth !== currJsMonth) {
-            /* if not due this month or next month, then consider for "set-aside" logic */
-            me.calculateSetAside(item, payableMonth, payableYear);
-            /* and don't add to upcoming payables list */
-            return;
-          }
-        }
-
+        var monthlyInstanceMonth = getMonthlyInstanceMonth(item);
+        var monthlyInstanceYear = getMonthlyInstanceYear(item);
+        var payments;
+        /* start by assuming that this is a monthly payable instance */
         var payable = {
           lineitem_id: item.lineitem_id,
           name: item.name,
           amount: item.amount,
           day: item.day,
-          month: payableMonth,
-          year: payableYear,
-          payment: (!item.payment || item.payment.month !== payableMonth) ? null : item.payment
+          month: monthlyInstanceMonth,
+          year: monthlyInstanceYear,
+          payment: (!item.payment || item.payment.year !== monthlyInstanceYear || item.payment.month !== monthlyInstanceMonth) ? null : item.payment
         };
-
-        if (item.month && item.payments && item.payments.length > 0) {
-          payable.payments = [];
-          /*TODO: filter out older payments at the DB query level*/
-          item.payments.forEach(function(past_payment) {
-            if (past_payment.year >= payable.year - 1) {
-              payable.payments.push(past_payment);
-            }
-          });
-          /*TODO: these might not be sorted correctly.*/
-          if (payable.payments[0].month === payableMonth && payable.payments[0].year === currYear) {
-            payable.payment = payable.payments[0];
+        /* if this payable is actually yearly... */
+        if (item.month) {
+          /* correct the instance's due date */
+          payable.month = item.month;
+          payable.year = getYearlyInstanceYear(item);
+          /* gather appropriate payments */
+          if (item.payments && item.payments.length > 0) {
+            payments = [];
+            /*TODO: filter out older payments at the DB query level*/
+            item.payments.forEach(function(past_payment) {
+              if (past_payment.year === payable.year - 1 && past_payment.month > payable.month || past_payment.year === payable.year && past_payment.month <= payable.month) {
+                payments.push(past_payment);
+              }
+            });
+            payable.payments = (payments.length === 0) ? null : payments;
+            determinePayment(payable);
+          } else {
+            payable.payments = null;
+            payable.payment = null;
+          }
+          /* if not due this month, then make a "set-aside" instance */
+          if (item.month - 1 !== currJsMonth) {
+            payable.is_aside = true;
+            payable.orig_month = payable.month;
+            payable.orig_year = payable.year;
+            payable.amount = item.amount / 12;
+            payable.month = monthlyInstanceMonth;
+            payable.year = monthlyInstanceYear;
+            determinePayment(payable);
+            me.asides.push(payable);
+            return;
           }
         }
 
         me.payables.push(payable);
-      });
-    };
-    me.calculateSetAside = function(item, payableMonth, payableYear) {
-      var no_payments = !item.payments || item.payments.length === 0;
-      me.asides.push({
-        lineitem_id: item.lineitem_id,
-        is_aside: true,
-        name: item.name,
-        amount: item.amount / 12,
-        month: payableMonth,
-        year: payableYear,
-        payments: no_payments ? null : item.payments,
-        payment: no_payments || item.payments[0].month !== payableMonth ? null : item.payments[0]
       });
     };
     me.togglePaid = function(payable) {

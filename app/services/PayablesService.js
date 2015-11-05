@@ -25,7 +25,6 @@
       var payment = {};
       payment.lineitem_id = payable.lineitem_id;
       payment.doctype = 'payment';
-      payment.day = payable.day;
       payment.month = payable.month;
       payment.year = payable.year;
       payment.amount = payable.amount;
