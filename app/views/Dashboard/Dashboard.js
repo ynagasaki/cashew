@@ -14,7 +14,7 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = new Date(2016,1,1,0,0,0,0);
+    var now = new Date();
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
     var currYear = now.getFullYear();
