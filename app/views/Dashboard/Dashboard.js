@@ -140,7 +140,7 @@
             payable.payment = null;
           }
           /* if not due this month, then make a "set-aside" instance */
-          if (item.month - 1 !== currJsMonth) {
+          if (item.month !== monthlyInstanceMonth) {
             payable.is_aside = true;
             payable.orig_month = payable.month;
             payable.orig_year = payable.year;
