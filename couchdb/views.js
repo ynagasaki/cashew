@@ -24,6 +24,7 @@
             };
             if (date.M) {
               payable.month = date.M;
+              payable.split = !!doc.freq.split;
             }
             emit([doc._id, 0], payable);
           }
