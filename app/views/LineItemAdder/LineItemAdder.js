@@ -105,6 +105,11 @@
       item.freq = {};
       item.freq.per = me.lineItem.period;
       item.freq.on = [];
+
+      if (item.freq.per === 'yr') {
+        item.freq.split = !!me.lineItem.split;
+      }
+
       me.lineItem.dates.forEach(function(date) {
         var on = {};
         if (item.freq.per === 'yr' && date.M) {

@@ -139,8 +139,14 @@
             payable.payments = null;
             payable.payment = null;
           }
-          /* if not due this month, then make a "set-aside" instance */
+          /* if not due on the payable month... */
           if (item.month !== monthlyInstanceMonth) {
+            /* first check if we want to split it */
+            if (!item.split) {
+              /* if not, skip this item completely */
+              return;
+            }
+            /* if so, then make a "set-aside" instance */
             payable.is_aside = true;
             payable.orig_month = payable.month;
             payable.orig_year = payable.year;

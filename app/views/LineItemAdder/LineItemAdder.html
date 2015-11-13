@@ -19,6 +19,7 @@
     <label for="amt" class="tip">Amount to <span ng-show="adder.lineItem.type === 'minus'">pay</span><span ng-show="adder.lineItem.type === 'plus'">earn</span></label>
   </div>
   <div class="field">
+    <span class="tip">How often?</span>
     <div style="display: inline-block;">
       <button type="button" class="pure-button" ng-class="{'pure-button-active' : adder.lineItem.period === 'mo'}" style="border: 1px solid #ccc; border-bottom-right-radius: 0px; border-top-right-radius: 0px;" ng-click="adder.lineItem.period = 'mo'">
         Monthly
@@ -26,7 +27,9 @@
         Yearly
       </button>
     </div>
-    <span class="tip">How often?</span>
+    <div ng-show="adder.lineItem.period === 'yr'" style="margin-top: 7px;">
+      <input id="split" type="checkbox" ng-model="adder.lineItem.split"> <label for="split">Split into monthly chunks</label>
+    </div>
   </div>
   <div class="field">
     <span class="tip" style="z-index: 100;">On which date<span ng-show="adder.lineItem.dates.length > 1">s</span>?</span>
