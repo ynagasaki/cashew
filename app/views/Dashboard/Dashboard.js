@@ -140,7 +140,7 @@
             payable.payment = null;
           }
           /* if not due on the payable month... */
-          if (item.month - 1 !== currJsMonth) {
+          if (item.month !== monthlyInstanceMonth) {
             /* first check if we want to split it */
             if (!item.split) {
               /* if not, skip this item completely */
