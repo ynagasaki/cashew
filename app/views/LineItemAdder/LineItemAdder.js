@@ -19,11 +19,9 @@
     var getNextId = function() {
       return ++an_id;
     };
-
     var newLineItemDate = function() {
       return {M:null,D:null,'?':getNextId()};
     };
-
     var newLineItem = function() {
       var item = {};
       item.period = 'mo';
@@ -31,10 +29,7 @@
       item.dates = [newLineItemDate()];
       return item;
     };
-
-    me.lineItem = newLineItem();
-
-    $scope.isInvalidDate = function(d) {
+    var isInvalidDate = function(d) {
       if (d.M) {
         if (!d.D) { 
           return true;
@@ -63,7 +58,9 @@
       return d.D && isNaN(d.D);
     };
 
-    $scope.getErrorMessage = function(item) {
+    me.lineItem = newLineItem();
+
+    me.getErrorMessage = function(item) {
       var i, d, dates = 0;
       if (!item.name) { return "Please enter a name."; }
       if (!item.amount || parseFloat(item.amount) === 0) { return "Please enter a valid, non-zero amount of money."; }
@@ -80,7 +77,7 @@
       } else if (item.period === 'yr') {
         for (i in item.dates) {
           d = item.dates[i];
-          if (d.M && !$scope.isInvalidDate(d)) {
+          if (d.M && !isInvalidDate(d)) {
             dates++;
           }
         }
@@ -136,7 +133,7 @@
       } else if (me.lineItem.period==='yr') {
         for (i = 0; i < me.lineItem.dates.length; ++i) {
           elem = me.lineItem.dates[i];
-          if (!elem.D || !elem.M || $scope.isInvalidDate(elem)) {
+          if (!elem.D || !elem.M || isInvalidDate(elem)) {
             return false;
           }
         }

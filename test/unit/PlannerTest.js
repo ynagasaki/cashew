@@ -1,16 +1,22 @@
 'use strict';
 
-describe('cashewApp.view1 module', function() {
+describe('cashewApp.Planner module', function() {
 
   beforeEach(module('cashewApp.Planner'));
 
-  describe('view1 controller', function(){
-
-    it('should ....', inject(function($controller) {
+  describe('Planner controller', function() {
+    it('should use LineItemsService to remove line items', inject(function($controller) {
       var noop = function() {};
-      var view1Ctrl = $controller('Planner', {$scope:{$on:noop}, LineItemsService:{lineItems:[], put:noop, refresh:noop}});
-      expect(view1Ctrl).toBeDefined();
-    }));
+      var remove_called = false;
+      var remove = function(item) {
+        remove_called = true;
+      };
+      var planner = $controller('Planner', {$scope:{$on:noop}, LineItemsService:{lineItems:[], put:noop, refresh:noop, remove:remove}});
+      expect(planner).toBeDefined();
 
+      planner.removeLineItem({lol:1});
+      expect(remove_called).toBe(true);
+    }));
   });
+
 });

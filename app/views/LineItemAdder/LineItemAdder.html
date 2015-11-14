@@ -59,7 +59,7 @@
     </button>
   </div>
   <div style="padding: 10px; text-align: right;">
-    <button class="pure-button pure-button-primary" ng-class="{'pure-button-disabled': getErrorMessage(adder.lineItem)!==null}">
+    <button class="pure-button pure-button-primary" ng-class="{'pure-button-disabled': adder.getErrorMessage(adder.lineItem)!==null}">
       <!-- i class="fa fa-check-circle"></i -->
       Save
     </button>
