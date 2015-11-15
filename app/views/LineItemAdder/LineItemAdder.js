@@ -91,7 +91,7 @@
     me.addItem = function() {
       var item;
 
-      if ($scope.getErrorMessage(me.lineItem) !== null) {
+      if (me.getErrorMessage(me.lineItem) !== null) {
         return;
       }
 

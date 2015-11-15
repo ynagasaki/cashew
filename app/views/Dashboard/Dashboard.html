@@ -25,31 +25,33 @@
     </div>
   </div>
   <div class="pure-u-2-3">
-    <table id="calendar" class="pure-table pure-table-bordered">
-      <thead>
-        <tr>
-          <th>Sun</th>
-          <th>Mon</th>
-          <th>Tue</th>
-          <th>Wed</th>
-          <th>Thu</th>
-          <th>Fri</th>
-          <th>Sat</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr ng-repeat="week in dash.datesArray">
-          <td ng-repeat="d in week" ng-class="{'out_of_range': dash.isOutOfRange(d)}">
-            <span ng-class="{'today' : dash.isToday(d)}">
-              <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
-              <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
-            </span>
-            <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
-              {{dash.getItemAmount(item) | currency}}
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div>
+      <table id="calendar" class="pure-table pure-table-bordered">
+        <thead>
+          <tr>
+            <th>Sun</th>
+            <th>Mon</th>
+            <th>Tue</th>
+            <th>Wed</th>
+            <th>Thu</th>
+            <th>Fri</th>
+            <th>Sat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="week in dash.datesArray">
+            <td ng-repeat="d in week" ng-class="{'out_of_range': dash.isOutOfRange(d)}">
+              <span ng-class="{'today' : dash.isToday(d)}">
+                <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
+                <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
+              </span>
+              <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
+                {{dash.getItemAmount(item) | currency}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
