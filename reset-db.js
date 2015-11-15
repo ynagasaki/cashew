@@ -2,7 +2,6 @@
 
 (function() {
   var http = require('http');
-  var querystring = require('querystring');
   var app_name = 'cashew';
   var HOSTNAME = 'localhost';
   var PORT = 5984;
