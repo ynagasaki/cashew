@@ -19,7 +19,7 @@
       var aside_amt = 0;
       var total = 0;
       lineItems.forEach(function(item) {
-        if (item.freq.per === 'yr' && item.freq.split) {
+        if (item.freq.per === 'yr'/* && item.freq.split*/) {
           aside_amt += item.amount / 12;
           return;
         }
@@ -34,9 +34,9 @@
       });
       total = debt_amt + pay_amt + aside_amt;
       return (total > 0) ? [
-        {color: '#FF4747', width: Math.round(debt_amt / total * 100)},
-        {color: '#FFDD45', width: Math.round(aside_amt / total * 100)},
-        {color: '#A5E85D', width: Math.round(pay_amt / total * 100)}
+        {name: 'Monthly payments', color: '#FF4747', width: Math.round(debt_amt / total * 100)},
+        {name: 'Yearly payment set-asides', color: '#FFDD45', width: Math.round(aside_amt / total * 100)},
+        {name: 'Monthly income', color: '#A5E85D', width: Math.round(pay_amt / total * 100)}
       ] : [];
     };
 

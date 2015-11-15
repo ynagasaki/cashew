@@ -9,7 +9,7 @@
   font-family: 'Capriola', sans-serif;
   text-transform: none;
 }
-.cashew-brand:hover {
+.cashew-brand:hover, .cashew-brand:focus {
   background-color: #A5E85D;
 }
 .cashew-nav li {
@@ -27,6 +27,9 @@ h2.section-header {
   padding: 10px;
   border-bottom: solid 1px #DEDEDE;
   background-color: #f5f5f5;
+}
+.metric-module {
+  padding: 10px;
 }
 .lineItem {
   padding: 10px;
@@ -74,17 +77,6 @@ div.field .tip {
   float: right;
   color: #999;
 }
-/*
-div.field > span.error {
-  display: block;
-  margin-top: 3px;
-  border-radius: 5px;
-  border: solid 2px #EE514C;
-  font: normal 10pt sans-serif;
-  color: #EE514C;
-  padding: 5px;
-}
-*/
 div.dates {
   padding-top: 0;
   vertical-align: top;
@@ -220,4 +212,14 @@ div.no-bg-color {
   border-top-right-radius: 3px;
   border-bottom-right-radius: 3px;
   /*border-right: solid 1px #777;*/
+}
+.legend {
+  display:inline-block;
+  margin-right: 15px;
+}
+.legend .legend-icon {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 5px;
 }
