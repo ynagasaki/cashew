@@ -2,6 +2,7 @@
 
 (function() {
   var http = require('http');
+  var querystring = require('querystring');
   var app_name = 'cashew';
   var HOSTNAME = 'localhost';
   var PORT = 5984;
@@ -9,7 +10,7 @@
   var DDOC_NAME = 'app';
   var VIEWS = require('./couchdb/views.js');
 
-  var request_in_general = function(method, path, content_type, data, next_action, fail_action) {
+  var request_in_general = function(method, path, headers, data, next_action, fail_action) {
     var options = {
       hostname: HOSTNAME,
       port: PORT,
@@ -17,10 +18,14 @@
       method: method
     };
 
-    if (content_type) {
-      options.headers = {
-        'Content-Type': content_type
-      };
+    if (headers) {
+      options.headers = {};
+      if (headers.ctype) {
+        options.headers['Content-Type'] = headers.ctype;
+      }
+      if (headers.rev) {
+        options.headers['If-Match'] = headers.rev;
+      }
     }
     
     var req = http.request(options, function(res) {
@@ -34,14 +39,14 @@
           console.warn(result.error + " because " + result.reason);
           if (fail_action) {
             console.log("(Ignoring...)");
-            fail_action();
+            fail_action(result);
           } else {
             console.log("(Exiting)");
             process.exit(1);
           }
         } else {
           console.log("(Ok)");
-          next_action();
+          next_action(result);
         }
       });
     }).on('error', console.error);
@@ -58,14 +63,14 @@
   };
 
   var request_json = function(method, path, data, next_action, fail_action) {
-    request_in_general(method, path, 'application/json', JSON.stringify(data), next_action, fail_action);
+    request_in_general(method, path, {ctype:'application/json'}, JSON.stringify(data), next_action, fail_action);
   };
 
-  var check_couchdb = function() {
+  var check_couchdb = function(next_action) {
     console.log("* Checking CouchDB connection on: " + ENDPOINT);
     http.get(ENDPOINT, function(res) {
       console.log("CouchDB is running: " + res.statusCode);
-      request('GET', app_name, wipe_db, create_db);
+      next_action();
     }).on('error', function(e) {
       console.error("Couldn't connect to CouchDB: " + e.message);
     });
@@ -82,12 +87,33 @@
   };
 
   var create_design = function() {
-    console.log("\n* Creating design doc '" + DDOC_NAME + "'...");
+    console.log("\n* Creating/updating design doc '" + DDOC_NAME + "'...");
+    var path = app_name + '/_design/' + DDOC_NAME;
     var design_doc = {
       views : VIEWS.getAll()
     };
-    request_json('PUT', app_name + '/_design/' + DDOC_NAME, design_doc, function(){console.log('DONE FOR NOW.');});
+    var success_func = function() { console.log('DONE FOR NOW.'); };
+    var put_design_func = function() {
+      request_json('PUT', path, design_doc, success_func);
+    };
+
+    request('GET', path, 
+      /* If the design doc exists, delete it first, then create it */
+      function(result) {
+        var rev = result._rev;
+        console.log("  Updating design doc: " + rev);
+        request_in_general('PUT', path, {rev:rev, ctype:'application/json'}, JSON.stringify(design_doc), success_func);
+      },
+      /* else, "GET" will fail, which is fine; just run the create routine */
+      put_design_func
+    );
   };
 
-  check_couchdb();
+  if (process.argv[2] && process.argv[2] === '--reinstall') {
+    check_couchdb(function() {
+      request('GET', app_name, wipe_db, create_db);
+    });
+  } else {
+    check_couchdb(create_design);
+  }
 })();
