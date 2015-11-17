@@ -31,6 +31,10 @@ h2.section-header {
 .metric-module {
   padding: 10px;
 }
+.button-warning {
+  background: rgb(255, 52, 52);
+  color: white;
+}
 .lineItem {
   padding: 10px;
   font: normal 10pt sans-serif;

@@ -24,9 +24,14 @@
           <span>{{date.D}}</span>
         </span>
       </span>
-      <button type="button" class="pure-button showOnHover" ng-click="planner.removeLineItem(item)">
-        <i class="fa fa-trash-o"></i>
-      </button>
+      <div ng-init="showConfirm = false" ng-mouseleave="showConfirm = false" style="display: inline-block;">
+        <button type="button" class="pure-button showOnHover" ng-hide="showConfirm" ng-click="showConfirm = true">
+          <i class="fa fa-trash-o"></i>
+        </button>
+        <button type="button" class="button-warning pure-button" ng-show="showConfirm" ng-click="planner.removeLineItem(item)">
+          <i class="fa fa-exclamation-triangle"></i> Confirm delete
+        </button>
+      </div>
     </div>
   </div>
 </div>
