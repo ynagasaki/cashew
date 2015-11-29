@@ -102,7 +102,7 @@
     me.isOutOfRange = function(date) {
       var mo = date.getMonth();
       var dt = date.getDate();
-      return (mo === nextJsMonth && dt >= currDay) || mo === lastJsMonth || (mo === currJsMonth && dt < currDay);
+      return (date.getFullYear() !== currYear) || (mo === nextJsMonth && dt >= currDay) || mo === lastJsMonth || (mo === currJsMonth && dt < currDay);
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
