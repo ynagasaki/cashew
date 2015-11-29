@@ -17,23 +17,10 @@
     var now = new Date();
     var currDay = now.getDate();
     var currJsMonth = now.getMonth();
+    var currMonth = currJsMonth + 1;
     var currYear = now.getFullYear();
     var nextJsMonth = (currJsMonth + 1) % 12;
     var lastJsMonth = (currJsMonth > 0) ? currJsMonth - 1 : 11;
-    var monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ];
 
     var getMonthlyInstanceMonth = function(item) {
       /* the month for a monthly payable instance is the current month, unless we're showing the next month's instance */
@@ -45,7 +32,7 @@
     };
     var getYearlyInstanceYear = function(item) {
       /* the year for a yearly payable instance that occurs after this year's instance is of course next year */
-      return (item.month && currJsMonth > item.month - 1) ? currYear + 1 : currYear;
+      return (item.month && (currMonth > item.month || currMonth === item.month && currDay > item.day)) ? currYear + 1 : currYear;
     };
     /* NB: getYearlyInstanceMonth is just the yearly payable item's "month" field */
     var determinePayment = function(payable) {
@@ -93,11 +80,11 @@
     me.isToday = function(date) {
       return currDay === date.getDate() && currJsMonth === date.getMonth() && currYear === date.getFullYear();
     };
-    me.getMonthName = function(item) {
+    me.getDueDate = function(item) {
       if (item.is_aside) {
-        return monthNames[item.orig_month - 1];
+        return new Date(item.orig_year, item.orig_month - 1, item.day, 0, 0, 0);
       }
-      return monthNames[item.month - 1];
+      return new Date(item.year, item.month - 1, item.day, 0, 0, 0);
     };
     me.isOutOfRange = function(date) {
       var mo = date.getMonth();
