@@ -45,6 +45,14 @@
           items.push(value);
           last_payable = value;
         } else if (value.doctype === 'payment') {
+          if (!last_payable) {
+            console.log('    SKIP payment: last payable is null');
+            return;
+          }
+          if (value.lineitem_id !== last_payable.lineitem_id) {
+            console.log('    SKIP payment: last payable is incompatible: ' + last_payable.lineitem_id + ' !== ' + value.lineitem_id); 
+            return;
+          }
           if (last_payable.month) {
             /* handle yearly payable */
             console.log('    prepending payment \'' + value._id + '\' to yearly payable: ' + last_payable.name);
