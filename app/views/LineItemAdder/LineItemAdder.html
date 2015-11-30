@@ -58,10 +58,12 @@
       <i class="fa fa-plus"></i> Add date
     </button>
   </div>
-  <div style="padding: 10px; text-align: right;">
-    <button class="pure-button pure-button-primary" ng-class="{'pure-button-disabled': adder.getErrorMessage(adder.lineItem)!==null}">
-      <!-- i class="fa fa-check-circle"></i -->
-      Save
-    </button>
-  </div>
+  <p style="padding: 10px 10px 0 10px; margin: 0;" ng-show="adder.errorMessage!==null">
+    <i class="fa fa-info-circle"></i>
+    {{adder.errorMessage}}
+  </p>
+  <button class="pure-button pure-button-primary" style="float: right; margin-top: 10px;">
+    <i class="fa fa-check-circle"></i>
+    Save
+  </button>
 </form>

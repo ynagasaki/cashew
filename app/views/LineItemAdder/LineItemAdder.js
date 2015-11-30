@@ -59,30 +59,49 @@
     };
 
     me.lineItem = newLineItem();
+    me.errorMessage = null;
 
     me.getErrorMessage = function(item) {
-      var i, d, dates = 0;
-      if (!item.name) { return "Please enter a name."; }
-      if (!item.amount || parseFloat(item.amount) === 0) { return "Please enter a valid, non-zero amount of money."; }
+      var i, d, j, seen = [];
+      if (!item.name) { 
+        return "Please enter a name."; 
+      }
+      if (!item.amount || parseFloat(item.amount) <= 0) { 
+        return "Please enter an amount."; 
+      }
       if (item.period === 'mo') {
         for (i in item.dates) {
           d = item.dates[i];
-          if (d.D && !isNaN(d.D) && d.D <= 28) {
-            dates++;
+          if (d.D && !isNaN(d.D)) {
+            if (d.D <= 28) {
+              for (j in seen) {
+                if (seen[j] === d.D) {
+                  return "Duplicate date: " + d.D;
+                }
+              }
+              seen.push(d.D);
+            } else {
+              return "For monthly items, only days up to 28 are supported.";
+            }
           }
         }
-        if (dates === 0 || dates < item.dates.length) {
-          return "Missing or invalid days (only days 1 to 28 are supported).";
+        if (seen.length < item.dates.length) {
+          return "Please ensure all date fields are complete and valid.";
         }
       } else if (item.period === 'yr') {
         for (i in item.dates) {
           d = item.dates[i];
           if (d.M && !isInvalidDate(d)) {
-            dates++;
+            for (j in seen) {
+              if (seen[j].D === d.D && seen[j].M === d.M) {
+                return "Duplicate date: " + d.M + "/" + d.D;
+              }
+            }
+            seen.push(d);
           }
         }
-        if (dates === 0 || dates < item.dates.length) {
-          return "Missing or invalid dates.";
+        if (seen.length < item.dates.length) {
+          return "Please ensure all date fields are complete and valid.";
         }
       }
       return null;
@@ -91,7 +110,8 @@
     me.addItem = function() {
       var item;
 
-      if (me.getErrorMessage(me.lineItem) !== null) {
+      me.errorMessage = me.getErrorMessage(me.lineItem);
+      if (me.errorMessage !== null) {
         return;
       }
 

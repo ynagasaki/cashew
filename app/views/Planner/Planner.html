@@ -20,8 +20,7 @@
       <span ng-show="item.freq">
         every {{item.freq.per}} on 
         <span ng-repeat="date in item.freq.on">
-          <span ng-show="date.M">{{date.M}}/</span>
-          <span>{{date.D}}</span>
+          <span ng-show="date.M">{{date.M}}/</span><span>{{date.D}}</span>
         </span>
       </span>
       <div ng-init="showConfirm = false" ng-mouseleave="showConfirm = false" style="display: inline-block;">
