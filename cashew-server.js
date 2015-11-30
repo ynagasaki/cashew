@@ -1,6 +1,7 @@
 'use strict';
 
 (function() {
+  var PORT = 8172;
   var nano = require('nano')('http://localhost:5984');
   var cashew_db = nano.db.use('cashew');
   var express = require('express');
@@ -112,7 +113,7 @@
     });
   });
 
-  var server = app.listen(3000, function() {
+  var server = app.listen(PORT, function() {
     var host = server.address().address;
     var port = server.address().port;
     console.log('cashew listening at http://%s:%s', host, port);
