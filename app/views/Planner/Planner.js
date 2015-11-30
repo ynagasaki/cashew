@@ -19,7 +19,7 @@
       var aside_amt = 0;
       var total = 0;
       lineItems.forEach(function(item) {
-        if (item.freq.per === 'yr'/* && item.freq.split*/) {
+        if (item.freq.per === 'yr' && item.type === 'minus'/* && item.freq.split*/) {
           aside_amt += item.amount / 12;
           return;
         }

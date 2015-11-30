@@ -27,7 +27,7 @@
         Yearly
       </button>
     </div>
-    <div ng-show="adder.lineItem.period === 'yr'" style="margin-top: 7px;">
+    <div ng-show="adder.lineItem.period === 'yr' && adder.lineItem.type === 'minus'" style="margin-top: 7px;">
       <input id="split" type="checkbox" ng-model="adder.lineItem.split"> <label for="split">Split into monthly chunks</label>
     </div>
   </div>
