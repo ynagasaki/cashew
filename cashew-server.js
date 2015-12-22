@@ -6,6 +6,7 @@
   var cashew_db = nano.db.use('cashew');
   var express = require('express');
   var bodyParser = require('body-parser');
+  var moment = require('moment');
   var app = express();
   var jsonParser = bodyParser.json();
 
@@ -30,8 +31,10 @@
     });
   });
 
-  app.get('/api/get/payables', function(req, res) {
-    console.log('get/payables');
+  app.get('/api/get/payables/:from/:to', function(req, res) {
+    var momentFrom = moment.unix(req.params.from);
+    var momentTo = moment.unix(req.params.to);
+    console.log('get/payables/' + momentFrom.format() + '/' + momentTo.format());
     cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});

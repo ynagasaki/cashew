@@ -8,8 +8,8 @@
 
     serv.payables = [];
 
-    serv.refresh = function() {
-      $http.get('/api/get/payables').then(function(result) {
+    serv.refresh = function(momentFrom, momentTo) {
+      $http.get('/api/get/payables/' + momentFrom.unix() + '/' + momentTo.unix()).then(function(result) {
         if (result.data.data) {
           serv.payables = result.data.data;
           $rootScope.$broadcast('payables.refreshed');

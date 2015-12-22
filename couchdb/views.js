@@ -13,23 +13,31 @@
       map: function(doc) {
         var payable;
         var date;
+        var day;
         if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq) {
           for (var i = 0; i < doc.freq.on.length; ++i) {
             date = doc.freq.on[i];
             payable = {
               doctype: 'payable',
+              subtype: 'monthly',
               name: doc.name,
               amount: doc.amount,
               day: date.D
             };
             if (date.M) {
+              payable.subtype = 'yearly';
               payable.month = date.M;
-              payable.split = !!doc.freq.split;
+              if (!!doc.freq.split) {
+                payable.subtype = 'setaside';
+                payable.fullAmount = doc.amount;
+                payable.amount = Math.round(doc.amount / 12);
+              }
             }
-            emit([doc._id, 0], payable);
+            emit([doc._id, 0, payable.day], payable);
           }
         } else if (doc.doctype === 'payment') {
-          emit([doc.lineitem_id, 1], doc);
+          day = (doc.day ? doc.day : 0);
+          emit([doc.lineitem_id, 1, day, [doc.year, doc.month, day]], doc);
         }
       }
     },
