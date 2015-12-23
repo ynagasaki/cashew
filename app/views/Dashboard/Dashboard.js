@@ -80,8 +80,10 @@
       });
     };
     me.togglePaid = function(payable) {
+      console.error(payable.name + " is not being used.");
     };
     me.getPercentComplete = function(aside) {
+      console.error(aside.name + " is not being used.");
       return 0.0;
     };
     me.getItemAmount = function(item) {

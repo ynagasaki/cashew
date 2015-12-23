@@ -50,6 +50,10 @@
     }
   };
 
+  exports.getViewsForTesting = function() {
+    return views;
+  };
+
   exports.getAll = function() {
     var result = {};
     var mapper, reducer;
