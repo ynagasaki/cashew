@@ -14,29 +14,47 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = moment();
-    var aMonthLater = moment().add(1, "months");
+    var now = moment().startOf('day');
+    var aMonthLater = moment(now).add(1, 'months');
 
     me.asides = [];
     me.payables = [];
-    me.datesArray = [];
+    me.datesArray = (function() {
+      var start = moment(now).startOf('week');
+      var end = moment(now).add(1, 'months').endOf('week');
+      var result = [];
+      var week = [];
+      while (start.isBefore(end)) {
+        week.push(moment(start).toDate());
+        if (week.length === 7) {
+          result.push(week);
+          week = [];
+        }
+        start.add(1, 'days');
+      }
+      return result;
+    })();
 
     me.payablesOn = function(d) {
       var result = [];
       return result;
     };
     me.isToday = function(date) {
-      return false;
+      return now.isSame(date, 'day');
     };
     me.getDueDate = function(item) {
       return new Date();
     };
     me.isOutOfRange = function(date) {
-      return false;
+      return now.isAfter(date) || aMonthLater.isBefore(date);
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
-        me.payables.push(item);
+        if (item.subtype === 'setaside') {
+          me.asides.push(item); 
+        } else {
+          me.payables.push(item);
+        }
       });
     };
     me.togglePaid = function(payable) {
@@ -45,7 +63,7 @@
       return 0.0;
     };
     me.getItemAmount = function(item) {
-      return 0.0;
+      return item.amount;
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);
