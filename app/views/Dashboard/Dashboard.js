@@ -17,6 +17,21 @@
     var now = moment().startOf('day');
     var aMonthLater = moment(now).add(1, 'months');
 
+    var getMonthlyPayableDueDate = function(payable) {
+      var candidate1 = moment(now).date(payable.day);
+      if (candidate1.isBetween(now, aMonthLater)) {
+        return candidate1;
+      }
+      return moment(aMonthLater).date(payable.day);
+    };
+    var getYearlyPayableDueDate = function(payable) {
+      var candidate1 = moment(now).month(payable.month).date(payable.day);
+      if (candidate1.isBetween(now, aMonthLater)) {
+        return candidate1;
+      }
+      return moment(aMonthLater).month(payable.month).date(payable.day);
+    };
+
     me.asides = [];
     me.payables = [];
     me.datesArray = (function() {
@@ -35,15 +50,15 @@
       return result;
     })();
 
-    me.payablesOn = function(d) {
+    me.payablesOn = function(date) {
       var result = [];
+      me.payables.forEach(function(item) {
+        
+      });
       return result;
     };
     me.isToday = function(date) {
       return now.isSame(date, 'day');
-    };
-    me.getDueDate = function(item) {
-      return new Date();
     };
     me.isOutOfRange = function(date) {
       return now.isAfter(date) || aMonthLater.isBefore(date);
@@ -51,8 +66,14 @@
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
         if (item.subtype === 'setaside') {
+          // Figure out how to assign dueDate here
           me.asides.push(item); 
         } else {
+          if (item.subtype === 'monthly') {
+            item.dueDate = getMonthlyPayableDueDate(item);
+          } else {
+            item.dueDate = getYearlyPayableDueDate(item);
+          }
           me.payables.push(item);
         }
       });

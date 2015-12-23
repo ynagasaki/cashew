@@ -5,22 +5,22 @@
       No payables? Manage line items on <a href="#/line-items">the Planning page</a>.
     </p>
 
-    <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: ['year','month','day']">
+    <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">
         {{dash.getItemAmount(item) | currency}}
         <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.payments">of {{item.amount | currency}}</span>
       </span>
-      <span class="due_label">{{dash.getDueDate(item) | date: 'MMM d'}}</span>
+      <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
     </div>
 
     <h2 class="section-header">Monthly Set-Asides</h2>
-    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: ['month','day']">
+    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: 'dueDate'">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}}</span>
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>
-      <span class="due_label">{{dash.getDueDate(item) | date: 'MMM d, yyyy'}}</span>
+      <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d, yyyy'}}</span>
       <div class="progress-bar">
         <div class="progress" ng-class="{'no-bg-color': dash.getPercentComplete(item)===0}" ng-style="{'width': dash.getPercentComplete(item) + '%'}">
           {{dash.getPercentComplete(item)}}%
