@@ -16,7 +16,6 @@
     var me = this;
     var now = moment().startOf('day');
     var aMonthLater = moment(now).add(1, 'months');
-
     var getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
       if (candidate1.isBetween(now, aMonthLater)) {
@@ -25,11 +24,11 @@
       return moment(aMonthLater).date(payable.day);
     };
     var getYearlyPayableDueDate = function(payable) {
-      var candidate1 = moment(now).month(payable.month).date(payable.day);
+      var candidate1 = moment(now).month(payable.month - 1).date(payable.day);
       if (candidate1.isBetween(now, aMonthLater)) {
         return candidate1;
       }
-      return moment(aMonthLater).month(payable.month).date(payable.day);
+      return moment(aMonthLater).month(payable.month - 1).date(payable.day);
     };
 
     me.asides = [];
@@ -53,7 +52,9 @@
     me.payablesOn = function(date) {
       var result = [];
       me.payables.forEach(function(item) {
-        
+        if (item.dueDate && item.dueDate.isSame(date)) {
+          result.push(item);
+        }
       });
       return result;
     };
