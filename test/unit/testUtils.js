@@ -10,3 +10,5 @@ var emit = function(key, value) {
 var clearEmitResults = function() {
   EMIT_RESULTS = [];
 };
+
+var noop = function() {};
