@@ -35,6 +35,10 @@
       return result;
     })();
 
+    me.setPeriod = function(val) {
+      now = moment(val).startOf('day');
+      aMonthLater = moment(now).add(1, 'months');
+    };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
       if (candidate1.isBetween(now, aMonthLater)) {
