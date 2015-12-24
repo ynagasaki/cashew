@@ -31,22 +31,28 @@
       it('should show upcoming payables in period', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-01-05'), [
           {subtype: 'monthly', day: 10},
+          {subtype: 'yearly', month: 1, day: 15}
         ]);
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2015-01-10');
+        expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-01-15');
       }));
       
       it('should show upcoming payables in period, regardless of month', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-01-30'), [
           {subtype: 'monthly', day: 10},
+          {subtype: 'yearly', month: 2, day: 15}
         ]);
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2015-02-10');
+        expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-02-15');
       }));
 
       it('should show upcoming payables in period, regardless of month and year', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-12-30'), [
           {subtype: 'monthly', day: 10},
+          {subtype: 'yearly', month: 1, day: 15}
         ]);
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2016-01-10');
+        expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2016-01-15');
       }));
     });
   });
