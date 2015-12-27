@@ -12,11 +12,11 @@
         {{dash.getItemAmount(item) | currency}}
         <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.payments">of {{item.amount | currency}}</span>
       </span>
-      <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d, yyyy'}}</span>
+      <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
     </div>
 
     <h2 class="section-header">Monthly Set-Asides</h2>
-    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: 'dueDate'">
+    <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: 'original.dueDate'">
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.original.name}}</span>
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">{{item.amount | currency}}</span>

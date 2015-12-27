@@ -17,6 +17,7 @@
     var now = null;
     var yesterday = null; /* moment#isBetween is exclusive :\ */
     var aMonthLater = null;
+    var aMonthLaterNextDay = null;
 
     me.asides = [];
     me.payables = [];
@@ -25,6 +26,7 @@
       now = moment(val).startOf('day');
       yesterday = moment(now).add(-1, 'days');
       aMonthLater = moment(now).add(1, 'months');
+      aMonthLaterNextDay = moment(aMonthLater).add(1, 'days');
     };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
@@ -36,17 +38,17 @@
     me.getYearlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).month(payable.month - 1).date(payable.day);
       if (candidate1.isBefore(now)) {
-        return candidate1.add(1, 'years');
+        candidate1.add(1, 'years');
       }
       return candidate1;
     };
-    /*me.getSetAsideOriginalPayableDueDate = function(payable) {
-      var candidate1 = moment(now).month(payable.original.month - 1).date(payable.original.day);
-      if (candidate1.isBetween(now, aMonthLater)) {
-        return candidate1;
+    me.getSetAsideOriginalPayableDueDate = function(payable) {
+      var originalDueDate = me.getYearlyPayableDueDate(payable.original);
+      if (originalDueDate.isBefore(aMonthLaterNextDay)) {
+        originalDueDate.add(1, 'years');
       }
-      return moment(aMonthLater).month(payable.month - 1).date(payable.day);
-    };*/
+      return originalDueDate;
+    };
     me.payablesOn = function(date) {
       var result = [];
       me.payables.forEach(function(item) {
@@ -65,7 +67,7 @@
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
         if (item.subtype === 'setaside') {
-          item.original.dueDate = me.getYearlyPayableDueDate(item.original);
+          item.original.dueDate = me.getSetAsideOriginalPayableDueDate(item);
           me.asides.push(item); 
         } else if (item.subtype === 'monthly') {
           item.dueDate = me.getMonthlyPayableDueDate(item);
@@ -91,7 +93,7 @@
     $scope.$on('payables.refreshed', me.updatePayables);
 
     me.setPeriod(moment('2016-02-28'));
-    
+
     me.datesArray = (function() {
       var start = moment(now).startOf('week');
       var end = moment(now).add(1, 'months').endOf('week');

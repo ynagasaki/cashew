@@ -69,27 +69,69 @@
         expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2016-01-15');
       }));
 
-      it('should not show yearly payables that does not fall in the current period', inject(function($controller) {
+      it('should not show yearly payables that do not fall in the current period', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-12-26'), [
           {subtype: 'yearly', month: 12, day: 25}
         ]);
         expect(payables.length).toBe(0);
       }));
 
-      it('should assign current year to yearly payable due dates that have not happened yet', inject(function($controller) {
-        var controller = setupController($controller, moment('2016-01-20'), []);
-        expect(controller.getYearlyPayableDueDate({month: 2, day: 15}).format('YYYY-MM-DD')).toBe('2016-02-15');
-      }));
+      it('should assign current year to yearly payable due dates that have not happened yet',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-01-20'), []);
+          expect(controller.getYearlyPayableDueDate({month: 2, day: 15}).format('YYYY-MM-DD')).toBe('2016-02-15');
+        })
+      );
 
-      it('should assign next year to yearly payable due dates happening before current period', inject(function($controller) {
-        var controller = setupController($controller, moment('2016-02-20'), []);
-        expect(controller.getYearlyPayableDueDate({month: 1, day: 15}).format('YYYY-MM-DD')).toBe('2017-01-15');
-      }));
+      it('should assign next year to yearly payable due dates happening before current period',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), []);
+          expect(controller.getYearlyPayableDueDate({month: 1, day: 15}).format('YYYY-MM-DD')).toBe('2017-01-15');
+        })
+      );
 
-      it('should assign current year to yearly payable due dates happening during current period', inject(function($controller) {
-        var controller = setupController($controller, moment('2016-02-20'), []);
-        expect(controller.getYearlyPayableDueDate({month: 2, day: 25}).format('YYYY-MM-DD')).toBe('2016-02-25');
-      }));
+      it('should assign current year to yearly payable due dates happening during current period',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), []);
+          expect(controller.getYearlyPayableDueDate({month: 2, day: 25}).format('YYYY-MM-DD')).toBe('2016-02-25');
+        })
+      );
+
+      it('should make set-aside\'s orig payable\'s due date the curr year if payable has not happened yet',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), []);
+          var input = {original: {month: 5, day: 25}};
+          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
+          expect(actual).toBe('2016-05-25');
+        })
+      );
+
+      it('should make set-aside\'s orig payable\'s due date next year if payable has happened',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), []);
+          var input = {original: {month: 2, day: 19}};
+          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
+          expect(actual).toBe('2017-02-19');
+        })
+      );
+
+      it('should make set-aside\'s orig payable\'s due date next year if payable is happening',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), []);
+          var input = {original: {month: 2, day: 25}};
+          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
+          expect(actual).toBe('2017-02-25');
+        })
+      );
+
+      it('should make set-aside\'s orig payable\'s due date next year if payable has happened (year-end corner case)',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-12-30'), []);
+          var input = {original: {month: 12, day: 29}};
+          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
+          expect(actual).toBe('2017-12-29');
+        })
+      );
     });
   });
 })();
