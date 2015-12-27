@@ -14,45 +14,39 @@
 
   dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
     var me = this;
-    var now = moment().startOf('day');
-    var aMonthLater = moment(now).add(1, 'months');
+    var now = null;
+    var yesterday = null; /* moment#isBetween is exclusive :\ */
+    var aMonthLater = null;
 
     me.asides = [];
     me.payables = [];
-    me.datesArray = (function() {
-      var start = moment(now).startOf('week');
-      var end = moment(now).add(1, 'months').endOf('week');
-      var result = [];
-      var week = [];
-      while (start.isBefore(end)) {
-        week.push(moment(start).toDate());
-        if (week.length === 7) {
-          result.push(week);
-          week = [];
-        }
-        start.add(1, 'days');
-      }
-      return result;
-    })();
 
     me.setPeriod = function(val) {
       now = moment(val).startOf('day');
+      yesterday = moment(now).add(-1, 'days');
       aMonthLater = moment(now).add(1, 'months');
     };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
-      if (candidate1.isBetween(now, aMonthLater)) {
+      if (candidate1.isBetween(yesterday, aMonthLater)) {
         return candidate1;
       }
       return moment(aMonthLater).date(payable.day);
     };
     me.getYearlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).month(payable.month - 1).date(payable.day);
+      if (candidate1.isBefore(now)) {
+        return candidate1.add(1, 'years');
+      }
+      return candidate1;
+    };
+    /*me.getSetAsideOriginalPayableDueDate = function(payable) {
+      var candidate1 = moment(now).month(payable.original.month - 1).date(payable.original.day);
       if (candidate1.isBetween(now, aMonthLater)) {
         return candidate1;
       }
       return moment(aMonthLater).month(payable.month - 1).date(payable.day);
-    };
+    };*/
     me.payablesOn = function(date) {
       var result = [];
       me.payables.forEach(function(item) {
@@ -71,23 +65,23 @@
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
         if (item.subtype === 'setaside') {
-          // Figure out how to assign dueDate here
+          item.original.dueDate = me.getYearlyPayableDueDate(item.original);
           me.asides.push(item); 
+        } else if (item.subtype === 'monthly') {
+          item.dueDate = me.getMonthlyPayableDueDate(item);
         } else {
-          if (item.subtype === 'monthly') {
-            item.dueDate = me.getMonthlyPayableDueDate(item);
-          } else {
-            item.dueDate = me.getYearlyPayableDueDate(item);
-          }
+          item.dueDate = me.getYearlyPayableDueDate(item);
+        }
+        if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
           me.payables.push(item);
         }
       });
     };
     me.togglePaid = function(payable) {
-      console.error(payable.name + " is not being used.");
+      console.warn(payable.name + " is not being used.");
     };
     me.getPercentComplete = function(aside) {
-      console.error(aside.name + " is not being used.");
+      console.warn(aside.name + " is not being used.");
       return 0.0;
     };
     me.getItemAmount = function(item) {
@@ -95,6 +89,24 @@
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);
+
+    me.setPeriod(moment('2016-02-28'));
+    
+    me.datesArray = (function() {
+      var start = moment(now).startOf('week');
+      var end = moment(now).add(1, 'months').endOf('week');
+      var result = [];
+      var week = [];
+      while (start.isBefore(end)) {
+        week.push(moment(start).toDate());
+        if (week.length === 7) {
+          result.push(week);
+          week = [];
+        }
+        start.add(1, 'days');
+      }
+      return result;
+    })();
 
     PayablesService.refresh(now, aMonthLater);
   }]);

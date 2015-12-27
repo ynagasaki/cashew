@@ -27,17 +27,22 @@
             if (date.M) {
               payable.subtype = 'yearly';
               payable.month = date.M;
+              emit([doc._id, 0], payable);
               if (!!doc.freq.split) {
-                payable.subtype = 'setaside';
-                payable.fullAmount = doc.amount;
-                payable.amount = Math.round(doc.amount / 12);
+                emit([doc._id, 0], {
+                  doctype: 'payable',
+                  subtype: 'setaside',
+                  amount: Math.round(doc.amount / 12),
+                  original: payable
+                });
               }
+            } else {
+              emit([doc._id, 0], payable);
             }
-            emit([doc._id, 0, payable.day], payable);
           }
         } else if (doc.doctype === 'payment') {
           day = (doc.day ? doc.day : 0);
-          emit([doc.lineitem_id, 1, day, [doc.year, doc.month, day]], doc);
+          emit([doc.lineitem_id, 1, [doc.year, doc.month, day]], doc);
         }
       }
     },

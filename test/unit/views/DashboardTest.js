@@ -4,7 +4,7 @@
   describe('cashewApp.Dashboard module', function() {
     beforeEach(module('cashewApp.Dashboard'));
 
-    var runUpdatePayables = function($controller, now, payablesArray) {
+    var setupController = function($controller, now, payablesArray) {
       var controller = $controller('DashboardController', {$scope: {$on: noop}, PayablesService: {
         refresh: noop,
         payables: payablesArray
@@ -13,13 +13,18 @@
       if (now) {
         controller.setPeriod(now);
       }
+      return controller;
+    };
+
+    var runUpdatePayables = function($controller, now, payablesArray) {
+      var controller = setupController($controller, now, payablesArray);
       controller.updatePayables();
       return controller.payables;
     };
 
     describe('Dashboard controller', function() {
       it('should assign due dates to all payables on update', inject(function($controller) {
-        var payables = runUpdatePayables($controller, null, [
+        var payables = runUpdatePayables($controller, moment('2015-01-09'), [
           {subtype: 'monthly', day: 10},
           {subtype: 'yearly', month: 1, day: 20}
         ]);
@@ -35,6 +40,15 @@
         ]);
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2015-01-10');
         expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-01-15');
+      }));
+
+      it('should show upcoming payables occurring today', inject(function($controller) {
+        var payables = runUpdatePayables($controller, moment('2015-01-05'), [
+          {subtype: 'monthly', day: 5},
+          {subtype: 'yearly', month: 1, day: 5}
+        ]);
+        expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2015-01-05');
+        expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-01-05');
       }));
       
       it('should show upcoming payables in period, regardless of month', inject(function($controller) {
@@ -53,6 +67,28 @@
         ]);
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2016-01-10');
         expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2016-01-15');
+      }));
+
+      it('should not show yearly payables that does not fall in the current period', inject(function($controller) {
+        var payables = runUpdatePayables($controller, moment('2015-12-26'), [
+          {subtype: 'yearly', month: 12, day: 25}
+        ]);
+        expect(payables.length).toBe(0);
+      }));
+
+      it('should assign current year to yearly payable due dates that have not happened yet', inject(function($controller) {
+        var controller = setupController($controller, moment('2016-01-20'), []);
+        expect(controller.getYearlyPayableDueDate({month: 2, day: 15}).format('YYYY-MM-DD')).toBe('2016-02-15');
+      }));
+
+      it('should assign next year to yearly payable due dates happening before current period', inject(function($controller) {
+        var controller = setupController($controller, moment('2016-02-20'), []);
+        expect(controller.getYearlyPayableDueDate({month: 1, day: 15}).format('YYYY-MM-DD')).toBe('2017-01-15');
+      }));
+
+      it('should assign current year to yearly payable due dates happening during current period', inject(function($controller) {
+        var controller = setupController($controller, moment('2016-02-20'), []);
+        expect(controller.getYearlyPayableDueDate({month: 2, day: 25}).format('YYYY-MM-DD')).toBe('2016-02-25');
       }));
     });
   });
