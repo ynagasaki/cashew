@@ -42,7 +42,7 @@
         expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-01-15');
       }));
 
-      it('should show upcoming payables occurring today', inject(function($controller) {
+      it('should show upcoming payables occurring on period start day', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-01-05'), [
           {subtype: 'monthly', day: 5},
           {subtype: 'yearly', month: 1, day: 5}

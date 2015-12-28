@@ -17,16 +17,14 @@
     var now = null;
     var yesterday = null; /* moment#isBetween is exclusive :\ */
     var aMonthLater = null;
-    var aMonthLaterNextDay = null;
 
     me.asides = [];
     me.payables = [];
 
     me.setPeriod = function(val) {
       now = moment(val).startOf('day');
-      yesterday = moment(now).add(-1, 'days');
+      yesterday = moment(now).add(-1, 'days').endOf('day');
       aMonthLater = moment(now).add(1, 'months');
-      aMonthLaterNextDay = moment(aMonthLater).add(1, 'days');
     };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
@@ -44,7 +42,7 @@
     };
     me.getSetAsideOriginalPayableDueDate = function(payable) {
       var originalDueDate = me.getYearlyPayableDueDate(payable.original);
-      if (originalDueDate.isBefore(aMonthLaterNextDay)) {
+      if (originalDueDate.isBefore(aMonthLater)) {
         originalDueDate.add(1, 'years');
       }
       return originalDueDate;
@@ -62,7 +60,7 @@
       return now.isSame(date, 'day');
     };
     me.isOutOfRange = function(date) {
-      return now.isAfter(date) || aMonthLater.isBefore(date);
+      return now.isAfter(date) || aMonthLater.isBefore(date) || aMonthLater.isSame(date);
     };
     me.updatePayables = function () {
       PayablesService.payables.forEach(function(item) {
@@ -92,7 +90,7 @@
 
     $scope.$on('payables.refreshed', me.updatePayables);
 
-    me.setPeriod(moment('2016-02-28'));
+    me.setPeriod(moment());
 
     me.datesArray = (function() {
       var start = moment(now).startOf('week');
