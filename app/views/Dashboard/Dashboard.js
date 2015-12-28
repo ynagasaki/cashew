@@ -84,9 +84,6 @@
       console.warn(aside.name + " is not being used.");
       return 0.0;
     };
-    me.getItemAmount = function(item) {
-      return item.amount;
-    };
 
     $scope.$on('payables.refreshed', me.updatePayables);
 

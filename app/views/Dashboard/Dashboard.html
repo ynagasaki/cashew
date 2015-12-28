@@ -9,7 +9,7 @@
       <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
       <span ng-class="{'paid': item.payment}">{{item.name}} ({{item.subtype}})</span>
       <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}">
-        {{dash.getItemAmount(item) | currency}}
+        {{item.amount | currency}}
         <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.payments">of {{item.amount | currency}}</span>
       </span>
       <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
@@ -50,7 +50,7 @@
                 <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
               </span>
               <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
-                {{dash.getItemAmount(item) | currency}}
+                {{item.amount | currency}}
               </span>
             </td>
           </tr>
