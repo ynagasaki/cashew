@@ -10,6 +10,20 @@
   var app = express();
   var jsonParser = bodyParser.json();
 
+  var payableKeysAreEqual = function(key1, key2) {
+    var i;
+    var len = key1.length;
+    if (len !== key2.length) {
+      return false;
+    }
+    for (i = 0; i < len; ++i) {
+      if (key1[i] !== key2[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+
   app.use(express.static('app'));
 
   app.get('/hello', function(req, res) {
@@ -21,7 +35,7 @@
     if (!payment) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('pay: ' + payment.lineitem_id);
+    console.log('pay: ' + payment.key);
     cashew_db.insert(payment, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
@@ -43,9 +57,9 @@
       var last_payable;
       body.rows.forEach(function(row) {
         var value = row.value;
+        value.key = row.key[0];
         if (value.doctype === 'payable') {
-          console.log('  pushing payable: ' + value.name);
-          value.lineitem_id = row.key[0];
+          console.log('  pushing payable: ' + value.name + '\t' + value.key);
           items.push(value);
           last_payable = value;
         } else if (value.doctype === 'payment') {
@@ -53,22 +67,15 @@
             console.log('    SKIP payment: last payable is null');
             return;
           }
-          if (value.lineitem_id !== last_payable.lineitem_id) {
-            console.log('    SKIP payment: last payable is incompatible: ' + last_payable.lineitem_id + ' !== ' + value.lineitem_id); 
+          if (!payableKeysAreEqual(value.key, last_payable.key)) {
+            console.log('    SKIP payment: last payable is incompatible: ' + last_payable.key + ' !== ' + value.key); 
             return;
           }
-          if (last_payable.month) {
-            /* handle yearly payable */
-            console.log('    prepending payment \'' + value._id + '\' to yearly payable: ' + last_payable.name);
-            if (!last_payable.payments) {
-              last_payable.payments = [];
-            }
-            last_payable.payments.unshift(value);
-          } else {
-            /* handle monthly payable */
-            console.log('    adding payment \'' + value._id + '\' to monthly payable: ' + last_payable.name);
-            last_payable.payment = value;
+          console.log('    prepending payment \'' + value._id + '\' to payable: ' + last_payable.name);
+          if (!last_payable.payments) {
+            last_payable.payments = [];
           }
+          last_payable.payments.unshift(value);
         }
       });
       res.json({ data: items });

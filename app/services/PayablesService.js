@@ -20,21 +20,19 @@
     };
 
     serv.pay = function(payable, then) {
-      var sum;
       /* Create a payment based on this payable */
-      var payment = {};
-      payment.lineitem_id = payable.lineitem_id;
-      payment.doctype = 'payment';
-      payment.month = payable.month;
-      payment.year = payable.year;
-      payment.amount = payable.amount;
-      if (!payable.is_aside && payable.payments) {
-        sum = 0;
-        payable.payments.forEach(function(entry) {
-          sum += entry.amount;
-        });
-        payment.amount -= sum;
-      }
+      var dueDate = (payable.subtype === 'setaside') ? payable.original.dueDate : payable.dueDate;
+      var payment = {
+        doctype: 'payment',
+        year: dueDate.year(),
+        month: dueDate.month() + 1,
+        day: dueDate.date(),
+        payable: {
+          key: payable.key,
+          name: payable.name,
+          amount: payable.amount
+        }
+      };
       /* Post payment */
       $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;

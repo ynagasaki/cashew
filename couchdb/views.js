@@ -13,7 +13,6 @@
       map: function(doc) {
         var payable;
         var date;
-        var day;
         if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq) {
           for (var i = 0; i < doc.freq.on.length; ++i) {
             date = doc.freq.on[i];
@@ -27,9 +26,9 @@
             if (date.M) {
               payable.subtype = 'yearly';
               payable.month = date.M;
-              emit([doc._id, 0], payable);
+              emit([[doc._id, payable.day, payable.month], 0], payable);
               if (!!doc.freq.split) {
-                emit([doc._id, 0], {
+                emit([[doc._id, null, payable.month], 0], {
                   doctype: 'payable',
                   subtype: 'setaside',
                   amount: Math.round(doc.amount / 12),
@@ -37,12 +36,11 @@
                 });
               }
             } else {
-              emit([doc._id, 0], payable);
+              emit([[doc._id, payable.day, null], 0], payable);
             }
           }
         } else if (doc.doctype === 'payment') {
-          day = (doc.day ? doc.day : 0);
-          emit([doc.lineitem_id, 1, [doc.year, doc.month, day]], doc);
+          emit([doc.payable.key, 1, [doc.year, doc.month, doc.day]], doc);
         }
       }
     },

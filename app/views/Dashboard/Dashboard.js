@@ -78,7 +78,7 @@
       });
     };
     me.togglePaid = function(payable) {
-      console.warn(payable.name + " is not being used.");
+      PayablesService.pay(payable);
     };
     me.getPercentComplete = function(aside) {
       console.warn(aside.name + " is not being used.");
