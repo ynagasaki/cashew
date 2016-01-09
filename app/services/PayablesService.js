@@ -21,7 +21,7 @@
 
     serv.pay = function(payable, then) {
       /* Create a payment based on this payable */
-      var dueDate = (payable.subtype === 'setaside') ? payable.original.dueDate : payable.dueDate;
+      var dueDate = payable.dueDate;
       var payment = {
         doctype: 'payment',
         year: dueDate.year(),

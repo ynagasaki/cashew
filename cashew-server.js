@@ -46,36 +46,40 @@
   });
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
-    var momentFrom = moment.unix(req.params.from);
-    var momentTo = moment.unix(req.params.to);
-    console.log('get/payables/' + momentFrom.format() + '/' + momentTo.format());
-    cashew_db.view('app', 'payables', function(err, body) {
+    var from = moment.unix(req.params.from);
+    var to = moment.unix(req.params.to);
+    console.log('get/payables/' + from.format() + '/' + to.format());
+    /*TODO: test this*/
+    cashew_db.view('app', 'payables', {startKey: [{}, {}, [from.year(), from.month() + 1, from.date()]], endKey: [{}, {}, [to.year(), to.month() + 1, to.date()]]}, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
       }
       var items = [];
-      var last_payable;
+      var lastPayable;
       body.rows.forEach(function(row) {
         var value = row.value;
         value.key = row.key[0];
         if (value.doctype === 'payable') {
           console.log('  pushing payable: ' + value.name + '\t' + value.key);
           items.push(value);
-          last_payable = value;
+          lastPayable = value;
         } else if (value.doctype === 'payment') {
-          if (!last_payable) {
+          if (!lastPayable) {
             console.log('    SKIP payment: last payable is null');
             return;
           }
-          if (!payableKeysAreEqual(value.key, last_payable.key)) {
-            console.log('    SKIP payment: last payable is incompatible: ' + last_payable.key + ' !== ' + value.key); 
+          if (!payableKeysAreEqual(value.key, lastPayable.key)) {
+            console.log('    SKIP payment: last payable is incompatible: ' + lastPayable.key + ' !== ' + value.key); 
             return;
           }
-          console.log('    prepending payment \'' + value._id + '\' to payable: ' + last_payable.name);
-          if (!last_payable.payments) {
-            last_payable.payments = [];
+          if (lastPayable.subtype === 'setaside') {
+            lastPayable = lastPayable.original;
           }
-          last_payable.payments.unshift(value);
+          console.log('    prepending payment \'' + value._id + '\' to payable: ' + lastPayable.name);
+          if (!lastPayable.payments) {
+            lastPayable.payments = [];
+          }
+          lastPayable.payments.unshift(value);
         }
       });
       res.json({ data: items });

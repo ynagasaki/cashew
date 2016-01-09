@@ -26,6 +26,24 @@
       yesterday = moment(now).add(-1, 'days').endOf('day');
       aMonthLater = moment(now).add(1, 'months');
     };
+    me.determinePaymentMade = function(item) {
+      var isSetAside = (item.subtype === 'setaside');
+      var payments = isSetAside ? item.original.payments : item.payments;
+      var payment;
+      var dueYear = item.dueDate.year();
+      var dueMonth = item.dueDate.month() + 1;
+      var dueDay = item.dueDate.date();
+      if (!payments || payments.length === 0) {
+        return;
+      }
+      for (var i = 0, len = payments.length; i < len; ++i) {
+        payment = payments[i];
+        if (payment.year === dueYear && payment.month === dueMonth && (isSetAside || payment.day === dueDay)) {
+          item.payment = payment;
+          return;
+        }
+      }
+    };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
       if (candidate1.isBetween(yesterday, aMonthLater)) {
@@ -66,23 +84,28 @@
       PayablesService.payables.forEach(function(item) {
         if (item.subtype === 'setaside') {
           item.original.dueDate = me.getSetAsideOriginalPayableDueDate(item);
+          item.dueDate = now; /* just make set-aside payment due dates based on current day */
           me.asides.push(item); 
-        } else if (item.subtype === 'monthly') {
-          item.dueDate = me.getMonthlyPayableDueDate(item);
         } else {
-          item.dueDate = me.getYearlyPayableDueDate(item);
+          item.dueDate = (item.subtype === 'monthly') ? me.getMonthlyPayableDueDate(item) : me.getYearlyPayableDueDate(item);
+          if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
+            me.payables.push(item);
+          }
         }
-        if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
-          me.payables.push(item);
-        }
+        me.determinePaymentMade(item);
       });
     };
     me.togglePaid = function(payable) {
-      PayablesService.pay(payable);
+      if (!payable.payment) {
+        PayablesService.pay(payable);
+      }
     };
     me.getPercentComplete = function(aside) {
       console.warn(aside.name + " is not being used.");
       return 0.0;
+    };
+    me.getNow = function() {
+      return now;
     };
 
     $scope.$on('payables.refreshed', me.updatePayables);
