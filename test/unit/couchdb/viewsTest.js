@@ -32,6 +32,7 @@
         expect(emitValue.day).toBe(2);
       });
 
+/*
       it('should emit 0 for payable keys; 1 for payment keys', function() {
         var views = exports.getViewsForTesting();
         var emitKey;
@@ -59,6 +60,7 @@
         expect(emitKey[0]).toBe(expectedKey);
         expect(emitKey[1]).toBe(1);
       });
+*/
     });
   });
 })();
