@@ -48,19 +48,23 @@
   app.get('/api/get/payables/:from/:to', function(req, res) {
     var from = moment.unix(req.params.from);
     var to = moment.unix(req.params.to);
-    console.log('get/payables/' + from.format() + '/' + to.format());
+    console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));
     /*TODO: test this*/
-    cashew_db.view('app', 'payables', {startKey: [{}, {}, [from.year(), from.month() + 1, from.date()]], endKey: [{}, {}, [to.year(), to.month() + 1, to.date()]]}, function(err, body) {
+    var start = [[], null, [from.year(), from.month() + 1, from.date()]];
+    var end   = [{}, {}, [to.year(),   to.month() + 1,   to.date()]];
+    cashew_db.view('app', 'payables', {startkey: start, endkey: end}, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
+        return;
       }
       var items = [];
       var lastPayable;
+      console.log('* Retrieved rows: ' + body.rows.length);
       body.rows.forEach(function(row) {
         var value = row.value;
         value.key = row.key[0];
         if (value.doctype === 'payable') {
-          console.log('  pushing payable: ' + value.name + '\t' + value.key);
+          console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);
           items.push(value);
           lastPayable = value;
         } else if (value.doctype === 'payment') {
@@ -91,6 +95,7 @@
     cashew_db.view('app', 'line-items', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
+        return;
       }
       var items = [];
       body.rows.forEach(function(row) {
