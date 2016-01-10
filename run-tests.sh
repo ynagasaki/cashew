@@ -31,8 +31,8 @@ if [[ UNIT -eq 1 ]]; then
 fi
 
 if [[ PROTRACTOR -eq 1 ]]; then
-  echo "## Running end-to-end tests"
-  node_modules/.bin/protractor "test/e2e/protractor.conf.js" --browser=firefox
+  echo "## Running end-to-end tests -- MAKE SURE VPN IS NOT ACTIVE"
+  node_modules/.bin/protractor "test/e2e/protractor.conf.js" --browser=chrome
   echo "(Done)"
   echo
 fi
