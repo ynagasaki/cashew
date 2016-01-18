@@ -2,12 +2,14 @@
 
 declare HINT=0
 declare UNIT=0
+declare SERVER_UNIT=0
 declare PROTRACTOR=0
 
-while getopts 'hup' flag; do
+while getopts 'husp' flag; do
   case "${flag}" in
     h) HINT=1 ;;
     u) UNIT=1 ;;
+    s) SERVER_UNIT=1 ;;
     p) PROTRACTOR=1 ;;
   esac
 done
@@ -25,9 +27,15 @@ if [[ HINT -eq 1 ]]; then
   echo
 fi
 
+if [[ SERVER_UNIT -eq 1 ]]; then
+  echo "## Running server unit tests"
+  node_modules/.bin/mocha ./test/unit/cashewServerTest.js
+  echo "(Done)"
+  echo
+fi
+
 if [[ UNIT -eq 1 ]]; then
   echo "## Running unit tests"
-  node_modules/.bin/mocha ./test/unit/cashewServerTest.js
   node_modules/.bin/karma start karma.conf.js --no-auto-watch --single-run --reporters=dots --browsers=Firefox
   echo "(Done)"
   echo
