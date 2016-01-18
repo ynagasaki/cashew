@@ -12,6 +12,9 @@ module.exports = function(config){
       'couchdb/*.js',
       'test/unit/**/*.js'
     ],
+    exclude: [
+      'test/unit/cashewServerTest.js'
+    ],
     autoWatch: true,
     frameworks: ['jasmine'],
     browsers: ['Chrome'],

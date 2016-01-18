@@ -49,10 +49,7 @@
     var from = moment.unix(req.params.from);
     var to = moment.unix(req.params.to);
     console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));
-    /*TODO: test this*/
-    var start = [[], null, [from.year(), from.month() + 1, from.date()]];
-    var end   = [{}, {}, [to.year(),   to.month() + 1,   to.date()]];
-    cashew_db.view('app', 'payables', {startkey: start, endkey: end}, function(err, body) {
+    cashew_db.view('app', 'payables', /*{startkey: start, endkey: end},*/ function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
         return;
