@@ -35,7 +35,8 @@
     if (!payment) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('pay: ' + payment.key);
+    payment.doctype = 'payment';
+    /*console.log('pay: ' + payment.key);*/
     cashew_db.insert(payment, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
@@ -48,7 +49,7 @@
   app.get('/api/get/payables/:from/:to', function(req, res) {
     var from = moment.unix(req.params.from);
     var to = moment.unix(req.params.to);
-    console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));
+    /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
     cashew_db.view('app', 'payables', /*{startkey: start, endkey: end},*/ function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
@@ -56,7 +57,7 @@
       }
       var items = [];
       var lastPayable;
-      console.log('* Retrieved rows: ' + body.rows.length);
+      /*console.log('* Retrieved rows: ' + body.rows.length);*/
       body.rows.forEach(function(row) {
         var value = row.value;
         value.key = row.key[0];
@@ -88,7 +89,7 @@
   });
 
   app.get('/api/get/line-items', function(req, res) {
-    console.log('GET');
+    /*console.log('GET');*/
     cashew_db.view('app', 'line-items', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
@@ -107,7 +108,7 @@
     if (!item) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('PUT ' + item.name);
+    /*console.log('PUT ' + item.name);*/
     item.doctype = 'lineitem';
     cashew_db.insert(item, function(err, body) {
       if (err) {
@@ -119,7 +120,7 @@
   });
 
   app.delete('/api/delete/:id/:rev', function(req, res) {
-    console.log('DELETE ' + req.params.id + ' ' + req.params.rev);
+    /*console.log('DELETE ' + req.params.id + ' ' + req.params.rev);*/
     cashew_db.destroy(req.params.id, req.params.rev, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: delete failed', data: err});

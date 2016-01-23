@@ -31,16 +31,16 @@
       res.on('end', function() {
         var result = JSON.parse(body.join(' '));
         if (result.error) {
-          console.warn(result.error + " because " + result.reason);
+          /*console.warn(result.error + " because " + result.reason);*/
           if (fail_action) {
-            console.log("(Ignoring...)");
+            /*console.log("(Ignoring...)");*/
             fail_action(result);
           } else {
-            console.log("(Exiting)");
+            /*console.log("(Exiting)");*/
             process.exit(1);
           }
         } else {
-          console.log("(Ok)");
+          /*console.log("(Ok)");*/
           next_action(result);
         }
       });
@@ -69,4 +69,5 @@
   exports.request = request;
   exports.requestJson = request_json;
   exports.requestGeneral = request_in_general;
+  exports.NOOP = function() {};
 })();
