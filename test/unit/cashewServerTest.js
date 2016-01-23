@@ -9,7 +9,6 @@
       { name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
       { name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} }
     ];
-
     var PAYMENTS = [
       [
         { year: 2016, month: 1, day: 15, payable: null },
@@ -19,9 +18,8 @@
         { year: 2016, month: 3, day: 16, payable: null }
       ]
     ];
-
-    /* Aww yeah, n^2 */
     var matchRetrievedByName = function(retrieved) {
+      /* Aww yeah, n^2 */
       retrieved.forEach(function(actual) {
         RECORDS.forEach(function(expected) {
           if (actual.name === expected.name) {
@@ -30,12 +28,10 @@
         });
       });
     };
-
     var itemToString = function(i, item) {
       var delim = '\t';
       return i + delim + JSON.stringify(item);
     };
-
     var sequentialInsert = function(path, data, i, success, done) {
       if (i === data.length) {
         return done;
@@ -53,7 +49,6 @@
         }, function(res) { console.error('    * failed to put item-' + i); });
       };
     };
-
     var sequentialDelete = function(data, i, done) {
       if (i === data.length) {
         return done;

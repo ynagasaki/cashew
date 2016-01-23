@@ -6,7 +6,7 @@
   var cashew_db = nano.db.use('cashew');
   var express = require('express');
   var bodyParser = require('body-parser');
-  var moment = require('moment');
+  /*var moment = require('moment');*/
   var app = express();
   var jsonParser = bodyParser.json();
 
@@ -47,8 +47,8 @@
   });
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
-    var from = moment.unix(req.params.from);
-    var to = moment.unix(req.params.to);
+    /*var from = moment.unix(req.params.from);*/
+    /*var to = moment.unix(req.params.to);*/
     /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
     cashew_db.view('app', 'payables', /*{startkey: start, endkey: end},*/ function(err, body) {
       if (err) {
