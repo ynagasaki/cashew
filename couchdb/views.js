@@ -27,10 +27,10 @@
               payable.subtype = 'yearly';
               payable.month = date.M;
               /*emit yearly payable*/
-              emit([[doc._id, payable.day, payable.month], 0], payable);
+              emit([doc._id, payable.day, payable.month].join('_'), payable);
               if (!!doc.freq.split) {
                 /*emit 'set-aside' payable*/
-                emit([[doc._id, null, payable.month], 0], {
+                emit([doc._id, null, payable.month].join('_'), {
                   doctype: 'payable',
                   subtype: 'setaside',
                   amount: Math.round(doc.amount / 12),
@@ -39,18 +39,16 @@
               }
             } else {
               /*emit monthly payable*/
-              emit([[doc._id, payable.day, null], 0], payable);
+              emit([doc._id, payable.day, null].join('_'), payable);
             }
           }
-        } else if (doc.doctype === 'payment') {
-          emit([doc.payable.key, 1, [doc.year, doc.month, doc.day]], doc);
         }
       }
     },
     'payments': {
       map: function(doc) {
         if (doc.doctype === 'payment') {
-          emit([doc.year, doc.month, doc.day], doc);
+          emit([doc.year, doc.month, doc.day, doc.payable.key], doc);
         }
       }
     }

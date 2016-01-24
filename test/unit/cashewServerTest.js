@@ -3,6 +3,7 @@
 (function() {
   var assert = require('assert');
   var UTILS = require('../../cashew-utils.js');
+  var moment = require('moment');
 
   describe('cashew server', function() {
     var RECORDS = [
@@ -67,7 +68,7 @@
       var success = function(i, datum) {
         PAYMENTS[i].forEach(function(payment) {
           payment.amount = datum.amount;
-          payment.payable = { name: datum.name, key: [datum.id, datum.freq.on[0].D, null] };
+          payment.payable = { name: datum.name, key: [datum.id, datum.freq.on[0].D, null].join('_') };
         });
       };
       var insertPayments = function() {
@@ -113,7 +114,9 @@
     });
 
     it('should retrieve payables with correct payments (desc)', function(done) {
-      UTILS.request('get', 'api/get/payables/2016-01-01/2016-03-01', function(result) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-04-01');
+      UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
         assert.equal(result.data.length, 2);
 
         var itemIdx = 0;
@@ -141,6 +144,41 @@
         assert.equal(item.payments[0].month, 3);
         assert.equal(item.payments[0].day, 16);
         assert.equal(item.payments[0].amount, 234);
+
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should not retrieve payable payments outside of date range', function(done) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-03-01');
+      UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
+        assert.equal(result.data.length, 2);
+
+        var itemIdx = 0;
+        var item = result.data[itemIdx];
+        assert.equal(item.name, '(test-1)');
+        assert.equal(item.amount, 123);
+        assert.equal(item.doctype, 'payable');
+        assert.equal(item.payments.length, PAYMENTS[itemIdx].length);
+        assert.equal(item.payments[0].year, 2016);
+        assert.equal(item.payments[0].month, 2);
+        assert.equal(item.payments[0].day, 15);
+        assert.equal(item.payments[0].amount, 123);
+        assert.equal(item.payments[1].year, 2016);
+        assert.equal(item.payments[1].month, 1);
+        assert.equal(item.payments[1].day, 15);
+        assert.equal(item.payments[1].amount, 123);
+
+        itemIdx = 1;
+        item = result.data[itemIdx];
+        assert.equal(item.name, '(test-2)');
+        assert.equal(item.amount, 234);
+        assert.equal(item.doctype, 'payable');
+        assert(!item.payments, 'payments array should not exist');
 
         done();
       }, function() {

@@ -6,23 +6,9 @@
   var cashew_db = nano.db.use('cashew');
   var express = require('express');
   var bodyParser = require('body-parser');
-  /*var moment = require('moment');*/
+  var moment = require('moment');
   var app = express();
   var jsonParser = bodyParser.json();
-
-  var payableKeysAreEqual = function(key1, key2) {
-    var i;
-    var len = key1.length;
-    if (len !== key2.length) {
-      return false;
-    }
-    for (i = 0; i < len; ++i) {
-      if (key1[i] !== key2[i]) {
-        return false;
-      }
-    }
-    return true;
-  };
 
   app.use(express.static('app'));
 
@@ -47,44 +33,57 @@
   });
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
-    /*var from = moment.unix(req.params.from);*/
-    /*var to = moment.unix(req.params.to);*/
+    var from = moment.unix(req.params.from);
+    var to = moment.unix(req.params.to);
+    var start = [from.year(), from.month()+1, from.date(), null];
+    var end = [to.year(), to.month()+1, to.date(), {}];
+
     /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
-    cashew_db.view('app', 'payables', /*{startkey: start, endkey: end},*/ function(err, body) {
+    cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
         return;
       }
+
       var items = [];
-      var lastPayable;
-      /*console.log('* Retrieved rows: ' + body.rows.length);*/
+      var itemsMap = {};
+
+      console.log('* Retrieved payables: ' + body.rows.length);
       body.rows.forEach(function(row) {
         var value = row.value;
-        value.key = row.key[0];
+        value.key = row.key;
         if (value.doctype === 'payable') {
           /*console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);*/
           items.push(value);
-          lastPayable = value;
-        } else if (value.doctype === 'payment') {
-          if (!lastPayable) {
-            /*console.log('    SKIP payment: last payable is null');*/
-            return;
-          }
-          if (!payableKeysAreEqual(value.key, lastPayable.key)) {
-            /*console.log('    SKIP payment: last payable is incompatible: ' + lastPayable.key + ' !== ' + value.key); */
-            return;
-          }
-          if (lastPayable.subtype === 'setaside') {
-            lastPayable = lastPayable.original;
-          }
-          /*console.log('    prepending payment \'' + value._id + '\' to payable: ' + lastPayable.name);*/
-          if (!lastPayable.payments) {
-            lastPayable.payments = [];
-          }
-          lastPayable.payments.unshift(value);
+          itemsMap[value.key] = value;
         }
       });
-      res.json({ data: items });
+
+      if (items.length === 0) {
+        res.json({ data: items });
+        return;
+      }
+
+      /* Get da payments */
+      cashew_db.view('app', 'payments', {startkey: start, endkey: end}, function(err, body) {
+        if (err) {
+          res.status(500).json({ msg: 'error: could not get payments', data: err});
+          return;
+        }
+
+        var lastPayable = null;
+
+        console.log('* Retrieved payments: ' + body.rows.length);
+        body.rows.forEach(function(row) {
+          if (lastPayable === null || lastPayable.key !== row.value.payable.key) {
+            lastPayable = itemsMap[row.value.payable.key];
+            lastPayable.payments = [];
+          }
+          lastPayable.payments.unshift(row.value);
+        });
+
+        res.json({ data: items });
+      });
     });
   });
 
