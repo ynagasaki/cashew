@@ -42,6 +42,8 @@
               emit([[doc._id, payable.day, null], 0], payable);
             }
           }
+        } else if (doc.doctype === 'payment') {
+          emit([doc.payable.key, 1, [doc.year, doc.month, doc.day]], doc);
         }
       }
     },

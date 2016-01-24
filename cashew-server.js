@@ -62,22 +62,22 @@
         var value = row.value;
         value.key = row.key[0];
         if (value.doctype === 'payable') {
-          console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);
+          /*console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);*/
           items.push(value);
           lastPayable = value;
         } else if (value.doctype === 'payment') {
           if (!lastPayable) {
-            console.log('    SKIP payment: last payable is null');
+            /*console.log('    SKIP payment: last payable is null');*/
             return;
           }
           if (!payableKeysAreEqual(value.key, lastPayable.key)) {
-            console.log('    SKIP payment: last payable is incompatible: ' + lastPayable.key + ' !== ' + value.key); 
+            /*console.log('    SKIP payment: last payable is incompatible: ' + lastPayable.key + ' !== ' + value.key); */
             return;
           }
           if (lastPayable.subtype === 'setaside') {
             lastPayable = lastPayable.original;
           }
-          console.log('    prepending payment \'' + value._id + '\' to payable: ' + lastPayable.name);
+          /*console.log('    prepending payment \'' + value._id + '\' to payable: ' + lastPayable.name);*/
           if (!lastPayable.payments) {
             lastPayable.payments = [];
           }
