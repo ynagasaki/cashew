@@ -48,7 +48,7 @@
       var items = [];
       var itemsMap = {};
 
-      console.log('* Retrieved payables: ' + body.rows.length);
+      /*console.log('* Retrieved payables: ' + body.rows.length);*/
       body.rows.forEach(function(row) {
         var value = row.value;
         value.key = row.key;
@@ -73,7 +73,7 @@
 
         var lastPayable = null;
 
-        console.log('* Retrieved payments: ' + body.rows.length);
+        /*console.log('* Retrieved payments: ' + body.rows.length);*/
         body.rows.forEach(function(row) {
           if (lastPayable === null || lastPayable.key !== row.value.payable.key) {
             lastPayable = itemsMap[row.value.payable.key];

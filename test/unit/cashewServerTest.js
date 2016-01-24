@@ -6,9 +6,10 @@
   var moment = require('moment');
 
   describe('cashew server', function() {
-    var RECORDS = [
+    var LINEITEMS = [
       { name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
-      { name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} }
+      { name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} },
+      { name: '(test-3)', type: 'minus', amount: 345, freq: {per: 'yr', on: [{M: 5, D: 23}], split: true} }
     ];
     var PAYMENTS = [
       [
@@ -17,12 +18,13 @@
       ],
       [
         { year: 2016, month: 3, day: 16, payable: null }
-      ]
+      ],
+      []
     ];
     var matchRetrievedByName = function(retrieved) {
       /* Aww yeah, n^2 */
       retrieved.forEach(function(actual) {
-        RECORDS.forEach(function(expected) {
+        LINEITEMS.forEach(function(expected) {
           if (actual.name === expected.name) {
             expected.retrieved = actual;
           }
@@ -74,7 +76,7 @@
       var insertPayments = function() {
         sequentialInsert('api/pay', [].concat.apply([], PAYMENTS), 0, UTILS.NOOP(), done)();
       };
-      sequentialInsert('api/put/line-item', RECORDS, 0, success, insertPayments)();
+      sequentialInsert('api/put/line-item', LINEITEMS, 0, success, insertPayments)();
     });
 
     after(function(done) {
@@ -82,11 +84,11 @@
       var deletePayments = function() {
         sequentialDelete([].concat.apply([], PAYMENTS), 0, done)();
       };
-      sequentialDelete(RECORDS, 0, deletePayments)();
+      sequentialDelete(LINEITEMS, 0, deletePayments)();
     });
 
     afterEach(function() {
-      RECORDS.forEach(function(item) {
+      LINEITEMS.forEach(function(item) {
         if (item.retrieved) {
           delete item.retrieved;
         }
@@ -95,11 +97,11 @@
 
     it('should get the test line item(s)', function(done) {
       UTILS.request('get', 'api/get/line-items', function(result) {
-        assert.equal(result.data.length, RECORDS.length);
+        assert.equal(result.data.length, LINEITEMS.length);
 
         matchRetrievedByName(result.data);
 
-        RECORDS.forEach(function(item) {
+        LINEITEMS.forEach(function(item) {
           assert(item.retrieved, 'Expected test line-item "' + item.name + '" to be retrieved.');
           assert.equal(item.retrieved.type, item.type);
           assert.equal(item.retrieved.amount, item.amount);
@@ -117,13 +119,12 @@
       var from = moment('2016-01-01');
       var to = moment('2016-04-01');
       UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
-        assert.equal(result.data.length, 2);
-
         var itemIdx = 0;
         var item = result.data[itemIdx];
         assert.equal(item.name, '(test-1)');
         assert.equal(item.amount, 123);
         assert.equal(item.doctype, 'payable');
+        assert.equal(item.subtype, 'monthly');
         assert.equal(item.payments.length, PAYMENTS[itemIdx].length);
         assert.equal(item.payments[0].year, 2016);
         assert.equal(item.payments[0].month, 2);
@@ -139,6 +140,7 @@
         assert.equal(item.name, '(test-2)');
         assert.equal(item.amount, 234);
         assert.equal(item.doctype, 'payable');
+        assert.equal(item.subtype, 'monthly');
         assert.equal(item.payments.length, PAYMENTS[itemIdx].length);
         assert.equal(item.payments[0].year, 2016);
         assert.equal(item.payments[0].month, 3);
@@ -156,13 +158,12 @@
       var from = moment('2016-01-01');
       var to = moment('2016-03-01');
       UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
-        assert.equal(result.data.length, 2);
-
         var itemIdx = 0;
         var item = result.data[itemIdx];
         assert.equal(item.name, '(test-1)');
         assert.equal(item.amount, 123);
         assert.equal(item.doctype, 'payable');
+        assert.equal(item.subtype, 'monthly');
         assert.equal(item.payments.length, PAYMENTS[itemIdx].length);
         assert.equal(item.payments[0].year, 2016);
         assert.equal(item.payments[0].month, 2);
@@ -178,7 +179,72 @@
         assert.equal(item.name, '(test-2)');
         assert.equal(item.amount, 234);
         assert.equal(item.doctype, 'payable');
+        assert.equal(item.subtype, 'monthly');
         assert(!item.payments, 'payments array should not exist');
+
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should give monthly payable keys format: "<line item ID>_<day>_"', function(done) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-01-30');
+      UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
+        var item = result.data[0];
+        assert.equal(item.name, '(test-1)');
+        assert.equal(item.amount, 123);
+        assert.equal(item.doctype, 'payable');
+        assert.equal(item.subtype, 'monthly');
+        assert.equal(item.key, [LINEITEMS[0].id, 15, null].join('_'));
+
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should give yearly payable keys format: "<line item ID>_<day>_<month>"', function(done) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-01-30');
+      UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
+        var item = null;
+        result.data.forEach(function(datum) {
+          if (item === null && datum.subtype === 'yearly') {
+            item = datum;
+          }
+        });
+        assert(item, 'expected a "yearly" payable');
+        assert.equal(item.name, '(test-3)');
+        assert.equal(item.amount, 345);
+        assert.equal(item.doctype, 'payable');
+        assert.equal(item.key, [LINEITEMS[2].id, 23, 5].join('_'));
+
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should give set-aside payable keys format: "<line item ID>__<month>"', function(done) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-01-30');
+      UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
+        var item = null;
+        result.data.forEach(function(datum) {
+          if (item === null && datum.subtype === 'setaside') {
+            item = datum;
+          }
+        });
+        assert(item, 'expected a "setaside" payable');
+        assert.equal(item.original.name, '(test-3)');
+        assert.equal(item.amount, Math.round(345 / 12));
+        assert.equal(item.doctype, 'payable');
+        assert.equal(item.key, [LINEITEMS[2].id, null, 5].join('_'));
 
         done();
       }, function() {

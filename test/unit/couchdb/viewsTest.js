@@ -31,36 +31,6 @@
         expect(emitValue.day).toBeDefined();
         expect(emitValue.day).toBe(2);
       });
-
-/*
-      it('should emit 0 for payable keys; 1 for payment keys', function() {
-        var views = exports.getViewsForTesting();
-        var emitKey;
-        var monthlyPayableDay = 27;
-        var expectedKey = ['xyz', monthlyPayableDay, null];
-
-        expect(views).toBeDefined();
-        expect(views.payables).toBeDefined();
-        expect(views.payables.map).toBeDefined();
-
-        views.payables.map({
-          _id: 'xyz', doctype: 'lineitem', type: 'minus', name: 'test1', amount: 123, freq: {per: 'mo', on: [{D:monthlyPayableDay}]}
-        });
-        views.payables.map({
-          payable: {key: expectedKey}, doctype: 'payment', amount: 123, day: 1, month: 1, year: 2015
-        });
-
-        expect(EMIT_RESULTS.length).toBe(2);
-
-        emitKey = EMIT_RESULTS[0].key;
-        expect(emitKey[0]).toEqual(expectedKey);
-        expect(emitKey[1]).toBe(0);
-
-        emitKey = EMIT_RESULTS[1].key;
-        expect(emitKey[0]).toBe(expectedKey);
-        expect(emitKey[1]).toBe(1);
-      });
-*/
     });
   });
 })();
