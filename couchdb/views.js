@@ -27,10 +27,10 @@
               payable.subtype = 'yearly';
               payable.month = date.M;
               /*emit yearly payable*/
-              emit([doc._id, payable.day, payable.month].join('_'), payable);
+              emit([doc._id, 'YR', payable.day, payable.month].join('_'), payable);
               if (!!doc.freq.split) {
                 /*emit 'set-aside' payable*/
-                emit([doc._id, null, payable.month].join('_'), {
+                emit([doc._id, 'SA', payable.day, payable.month].join('_'), {
                   doctype: 'payable',
                   subtype: 'setaside',
                   amount: Math.round(doc.amount / 12),
@@ -39,7 +39,7 @@
               }
             } else {
               /*emit monthly payable*/
-              emit([doc._id, payable.day, null].join('_'), payable);
+              emit([doc._id, 'MO', payable.day, null].join('_'), payable);
             }
           }
         }
@@ -64,12 +64,12 @@
     var resplace = function(str) {
       return str.replace(/[\n\t\r ]+/g, ' ');
     };
-    
+
     for (var view_name in views) {
       if (!views.hasOwnProperty(view_name)) {
         continue;
       }
-      
+
       console.log('  Adding view: ' + view_name);
 
       mapper = resplace((views[view_name].map || 'lol').toString());
@@ -82,7 +82,7 @@
 
       result[view_name] = (reducer === 'lol') ? {map : mapper} : {map : mapper, reduce : reducer};
     }
-    
+
     return result;
   };
 })();

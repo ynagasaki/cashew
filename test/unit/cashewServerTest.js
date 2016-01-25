@@ -70,7 +70,7 @@
       var success = function(i, datum) {
         PAYMENTS[i].forEach(function(payment) {
           payment.amount = datum.amount;
-          payment.payable = { name: datum.name, key: [datum.id, datum.freq.on[0].D, null].join('_') };
+          payment.payable = { name: datum.name, key: [datum.id, 'MO', datum.freq.on[0].D, null].join('_') };
         });
       };
       var insertPayments = function() {
@@ -189,7 +189,7 @@
       });
     });
 
-    it('should give monthly payable keys format: "<line item ID>_<day>_"', function(done) {
+    it('should give monthly payable keys format: "<line item ID>_MO_<day>_"', function(done) {
       var from = moment('2016-01-01');
       var to = moment('2016-01-30');
       UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
@@ -198,7 +198,7 @@
         assert.equal(item.amount, 123);
         assert.equal(item.doctype, 'payable');
         assert.equal(item.subtype, 'monthly');
-        assert.equal(item.key, [LINEITEMS[0].id, 15, null].join('_'));
+        assert.equal(item.key, [LINEITEMS[0].id, 'MO', 15, null].join('_'));
 
         done();
       }, function() {
@@ -207,7 +207,7 @@
       });
     });
 
-    it('should give yearly payable keys format: "<line item ID>_<day>_<month>"', function(done) {
+    it('should give yearly payable keys format: "<line item ID>_YR_<day>_<month>"', function(done) {
       var from = moment('2016-01-01');
       var to = moment('2016-01-30');
       UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
@@ -221,7 +221,7 @@
         assert.equal(item.name, '(test-3)');
         assert.equal(item.amount, 345);
         assert.equal(item.doctype, 'payable');
-        assert.equal(item.key, [LINEITEMS[2].id, 23, 5].join('_'));
+        assert.equal(item.key, [LINEITEMS[2].id, 'YR', 23, 5].join('_'));
 
         done();
       }, function() {
@@ -230,7 +230,7 @@
       });
     });
 
-    it('should give set-aside payable keys format: "<line item ID>__<month>"', function(done) {
+    it('should give set-aside payable keys format: "<line item ID>_SA_<orig day>_<orig month>"', function(done) {
       var from = moment('2016-01-01');
       var to = moment('2016-01-30');
       UTILS.request('get', 'api/get/payables/' + from.unix() + '/' + to.unix(), function(result) {
@@ -244,7 +244,7 @@
         assert.equal(item.original.name, '(test-3)');
         assert.equal(item.amount, Math.round(345 / 12));
         assert.equal(item.doctype, 'payable');
-        assert.equal(item.key, [LINEITEMS[2].id, null, 5].join('_'));
+        assert.equal(item.key, [LINEITEMS[2].id, 'SA', 23, 5].join('_'));
 
         done();
       }, function() {
