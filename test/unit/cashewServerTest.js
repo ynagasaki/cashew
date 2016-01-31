@@ -13,11 +13,11 @@
     ];
     var PAYMENTS = [
       [
-        { year: 2016, month: 1, day: 15, payable: null },
-        { year: 2016, month: 2, day: 15, payable: null }
+        { year: 2016, month: 1, day: 15},
+        { year: 2016, month: 2, day: 15}
       ],
       [
-        { year: 2016, month: 3, day: 16, payable: null }
+        { year: 2016, month: 3, day: 16}
       ],
       []
     ];
@@ -44,7 +44,7 @@
         UTILS.requestJson('put', path, datum, function(res) {
           datum.id = res.data.id;
           datum.rev = res.data.rev;
-          /*console.log('    * put ' + itemToString(i, datum));*/
+          console.log('    * put ' + itemToString(i, datum));
           if (success) {
             success(i, datum);
           }
@@ -59,7 +59,7 @@
       return function() {
         var item = data[i];
         UTILS.request('delete', 'api/delete/' + item.id + '/' + item.rev, function(result) {
-          /*console.log('    * del ' + itemToString(i, item));*/
+          console.log('    * del ' + itemToString(i, item));
           sequentialDelete(data, i + 1, done)();
         }, function(res) { console.error('    * failed to delete ' + itemToString(i, item)); });
       };
@@ -70,7 +70,7 @@
       var success = function(i, datum) {
         PAYMENTS[i].forEach(function(payment) {
           payment.amount = datum.amount;
-          payment.payable = { name: datum.name, key: [datum.id, 'MO', datum.freq.on[0].D, null].join('_') };
+          payment.payableInstance = { name: datum.name, key: [datum.id, 'MO', datum.freq.on[0].D, null].join('_') };
         });
       };
       var insertPayments = function() {

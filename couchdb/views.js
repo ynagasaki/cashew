@@ -11,8 +11,7 @@
     },
     'payables': {
       map: function(doc) {
-        var payable;
-        var date;
+        var payable, date, key;
         if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq) {
           for (var i = 0; i < doc.freq.on.length; ++i) {
             date = doc.freq.on[i];
@@ -26,11 +25,15 @@
             if (date.M) {
               payable.subtype = 'yearly';
               payable.month = date.M;
+              payable.split = !!doc.freq.split;
+              payable.key = [doc._id, 'YR', payable.day, payable.month].join('_');
               /*emit yearly payable*/
-              emit([doc._id, 'YR', payable.day, payable.month].join('_'), payable);
-              if (!!doc.freq.split) {
+              emit(payable.key, payable);
+              if (payable.split) {
+                key = [doc._id, 'SA', payable.day, payable.month].join('_');
                 /*emit 'set-aside' payable*/
-                emit([doc._id, 'SA', payable.day, payable.month].join('_'), {
+                emit(key, {
+                  key: key,
                   doctype: 'payable',
                   subtype: 'setaside',
                   amount: Math.round(doc.amount / 12),
@@ -38,8 +41,9 @@
                 });
               }
             } else {
+              payable.key = [doc._id, 'MO', payable.day, null].join('_');
               /*emit monthly payable*/
-              emit([doc._id, 'MO', payable.day, null].join('_'), payable);
+              emit(payable.key, payable);
             }
           }
         }
@@ -48,7 +52,7 @@
     'payments': {
       map: function(doc) {
         if (doc.doctype === 'payment') {
-          emit([doc.year, doc.month, doc.day, doc.payable.key], doc);
+          emit([doc.year, doc.month, doc.day, doc.key], doc);
         }
       }
     }

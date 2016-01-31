@@ -23,15 +23,21 @@
       /* Create a payment based on this payable */
       var dueDate = payable.dueDate;
       var payment = {
+        key: payable.key,
         year: dueDate.year(),
         month: dueDate.month() + 1,
         day: dueDate.date(),
-        payable: {
-          key: payable.key,
-          name: payable.name,
-          amount: payable.amount
-        }
+        amount: payable.amount
       };
+      if (payable.subtype === 'setaside') {
+        payment.payableInstance = {
+          key: payable.original.key,
+          amount: payable.original.amount,
+          year: payable.original.dueDate.year(),
+          month: payable.original.dueDate.month() + 1,
+          day: payable.original.dueDate.date()
+        };
+      }
       /* Post payment */
       $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;

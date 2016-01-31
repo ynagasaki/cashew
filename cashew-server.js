@@ -33,12 +33,12 @@
   });
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
-    var from = moment.unix(req.params.from);
+    var from = moment.unix(req.params.from).add(-12, 'months');
     var to = moment.unix(req.params.to);
     var start = [from.year(), from.month()+1, from.date(), null];
     var end = [to.year(), to.month()+1, to.date(), {}];
 
-    /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
+    console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));
     cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
@@ -48,12 +48,11 @@
       var items = [];
       var itemsMap = {};
 
-      /*console.log('* Retrieved payables: ' + body.rows.length);*/
+      console.log('* Retrieved payables: ' + body.rows.length);
       body.rows.forEach(function(row) {
         var value = row.value;
-        value.key = row.key;
         if (value.doctype === 'payable') {
-          /*console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);*/
+          console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);
           items.push(value);
           itemsMap[value.key] = value;
         }
@@ -65,21 +64,28 @@
       }
 
       /* Get da payments */
-      cashew_db.view('app', 'payments', {startkey: start, endkey: end}, function(err, body) {
+      var filter = {startkey: start, endkey: end};
+      cashew_db.view('app', 'payments', filter, function(err, body) {
         if (err) {
           res.status(500).json({ msg: 'error: could not get payments', data: err});
           return;
         }
 
-        var lastPayable = null;
-
-        /*console.log('* Retrieved payments: ' + body.rows.length);*/
+        console.log('* Retrieved payments: ' + body.rows.length);
         body.rows.forEach(function(row) {
-          if (lastPayable === null || lastPayable.key !== row.value.payable.key) {
-            lastPayable = itemsMap[row.value.payable.key];
-            lastPayable.payments = [];
+          var payment = row.value;
+          var payable = itemsMap[payment.key];
+          if (!payable.payments) {
+            payable.payments = [];
           }
-          lastPayable.payments.unshift(row.value);
+          payable.payments.unshift(payment);
+          if (payment.payableInstance) {
+            payable = itemsMap[payment.payableInstance.key];
+            if (!payable.payments) {
+              payable.payments = [];
+            }
+            payable.payments.unshift(payment);
+          }
         });
 
         res.json({ data: items });
