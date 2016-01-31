@@ -38,7 +38,7 @@
     var start = [from.year(), from.month()+1, from.date(), null];
     var end = [to.year(), to.month()+1, to.date(), {}];
 
-    console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));
+    /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
     cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
@@ -48,11 +48,11 @@
       var items = [];
       var itemsMap = {};
 
-      console.log('* Retrieved payables: ' + body.rows.length);
+      /*console.log('* Retrieved payables: ' + body.rows.length);*/
       body.rows.forEach(function(row) {
         var value = row.value;
         if (value.doctype === 'payable') {
-          console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);
+          /*console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);*/
           items.push(value);
           itemsMap[value.key] = value;
         }
@@ -71,7 +71,7 @@
           return;
         }
 
-        console.log('* Retrieved payments: ' + body.rows.length);
+        /*console.log('* Retrieved payments: ' + body.rows.length);*/
         body.rows.forEach(function(row) {
           var payment = row.value;
           var payable = itemsMap[payment.key];
