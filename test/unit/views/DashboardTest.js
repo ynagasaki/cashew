@@ -196,7 +196,7 @@
         })
       );
 
-      it('should only defined a "payment" field if a payment exists',
+      it('should only define a "payment" field if a payment exists',
         inject(function($controller) {
           var controller = setupController($controller, moment('2016-01-20'), []);
           var item = {

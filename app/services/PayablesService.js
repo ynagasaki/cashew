@@ -8,6 +8,19 @@
 
     serv.payables = [];
 
+    serv.updatePayments = function(payable, payment) {
+      var paymentDate = moment([payment.year, payment.month - 1, payment.day]);
+      var i, len = payable.payments.length;
+      var currPayment;
+      for (i = 0; i < len; i++) {
+        currPayment = payable.payments[i];
+        if (paymentDate.isAfter([currPayment.year, currPayment.month - 1, currPayment.day])) {
+          payable.payments.splice(i, 0, payment);
+          return;
+        }
+      }
+    };
+
     serv.refresh = function(momentFrom, momentTo) {
       $http.get('/api/get/payables/' + momentFrom.unix() + '/' + momentTo.unix()).then(function(result) {
         if (result.data.data) {
