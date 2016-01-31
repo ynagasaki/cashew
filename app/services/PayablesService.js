@@ -19,7 +19,7 @@
       });
     };
 
-    serv.pay = function(payable, then) {
+    serv.pay = function(payable) {
       /* Create a payment based on this payable */
       var dueDate = payable.dueDate;
       var payment = {
@@ -49,33 +49,21 @@
           payable.payment = null;
           console.log('failed to pay ' + payable.name + ': ' + result.data);
         }
-        if (then) {
-          then(payable);
-        }
       }, function(result) {
         console.log('failed to pay ' + payable.name + ': ' + result.data);
         payable.payment = null;
-        if (then) {
-          then(payable);
-        }
       });
     };
 
-    serv.unpay = function(payable, then) {
+    serv.unpay = function(payable) {
       var payment = payable.payment;
       $http.delete('/api/delete/' + payment._id + '/' + payment._rev, payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
           payable.payment = null;
         }
-        if (then) {
-          then(payable);
-        }
       }, function(result) {
         console.log('failed to unpay ' + payable.name + ': ' + result.data);
-        if (then) {
-          then(payable);
-        }
       });
     };
 

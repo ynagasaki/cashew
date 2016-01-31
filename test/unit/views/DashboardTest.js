@@ -144,6 +144,71 @@
         })
       );
 
+      it('should find a payment made for a monthly payable',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-01-20'), []);
+          var item = {
+            subtype: 'monthly',
+            dueDate: moment('2016-01-20'),
+            payments: [
+              {year: 2016, month: 1, day: 15, amount: 5},
+              {year: 2016, month: 1, day: 20, amount: 10}
+            ]
+          };
+          controller.determinePaymentMade(item);
+          expect(item.payment).toBeDefined();
+          expect(item.payment.amount).toBe(10);
+        })
+      );
+
+      it('should find a payment made for a yearly payable',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-01-20'), []);
+          var item = {
+            subtype: 'yearly',
+            dueDate: moment('2016-01-20'),
+            payments: [
+              {year: 2016, month: 1, day: 15, amount: 5},
+              {year: 2016, month: 1, day: 20, amount: 10}
+            ]
+          };
+          controller.determinePaymentMade(item);
+          expect(item.payment).toBeDefined();
+          expect(item.payment.amount).toBe(10);
+        })
+      );
+
+      it('should find a payment made for a setaside payable (month shouldn\'t matter)',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-01-20'), []);
+          var item = {
+            subtype: 'setaside',
+            dueDate: moment('2016-01-20'),
+            payments: [
+              {year: 2016, month: 2, day: 15, amount: 5},
+              {year: 2016, month: 2, day: 20, amount: 10},
+              {year: 2016, month: 1, day: 30, amount: 20}
+            ]
+          };
+          controller.determinePaymentMade(item);
+          expect(item.payment).toBeDefined();
+          expect(item.payment.amount).toBe(20);
+        })
+      );
+
+      it('should only defined a "payment" field if a payment exists',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-01-20'), []);
+          var item = {
+            subtype: 'monthly',
+            dueDate: moment('2016-01-20'),
+            payments: []
+          };
+          controller.determinePaymentMade(item);
+          expect(item.payment).toBeUndefined();
+        })
+      );
+
     });
   });
 })();
