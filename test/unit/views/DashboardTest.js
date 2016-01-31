@@ -50,7 +50,7 @@
         expect(payables[0].dueDate.format('YYYY-MM-DD')).toBe('2015-01-05');
         expect(payables[1].dueDate.format('YYYY-MM-DD')).toBe('2015-01-05');
       }));
-      
+
       it('should show upcoming payables in period, regardless of month', inject(function($controller) {
         var payables = runUpdatePayables($controller, moment('2015-01-30'), [
           {subtype: 'monthly', day: 10},
@@ -97,41 +97,53 @@
         })
       );
 
+      it('should only add set-asides if the yearly payable is not in the current period',
+        inject(function($controller) {
+          var controller = setupController($controller, moment('2016-02-20'), [
+            {subtype: 'setaside', original: {month: 3, day: 1}}
+          ]);
+          controller.updatePayables();
+          expect(controller.asides).toBeDefined();
+          expect(controller.asides.length).toBe(0);
+        })
+      );
+
       it('should make set-aside\'s orig payable\'s due date the curr year if payable has not happened yet',
         inject(function($controller) {
-          var controller = setupController($controller, moment('2016-02-20'), []);
-          var input = {original: {month: 5, day: 25}};
-          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
-          expect(actual).toBe('2016-05-25');
+          var controller = setupController($controller, moment('2016-02-20'), [
+            {subtype: 'setaside', original: {month: 3, day: 25}}
+          ]);
+          controller.updatePayables();
+          expect(controller.asides).toBeDefined();
+          expect(controller.asides.length).toBe(1);
+          expect(controller.asides[0].original.dueDate.format('YYYY-MM-DD')).toBe('2016-03-25');
         })
       );
 
       it('should make set-aside\'s orig payable\'s due date next year if payable has happened',
         inject(function($controller) {
-          var controller = setupController($controller, moment('2016-02-20'), []);
-          var input = {original: {month: 2, day: 19}};
-          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
-          expect(actual).toBe('2017-02-19');
-        })
-      );
-
-      it('should make set-aside\'s orig payable\'s due date next year if payable is happening',
-        inject(function($controller) {
-          var controller = setupController($controller, moment('2016-02-20'), []);
-          var input = {original: {month: 2, day: 25}};
-          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
-          expect(actual).toBe('2017-02-25');
+          var controller = setupController($controller, moment('2016-02-20'), [
+            {subtype: 'setaside', original: {month: 2, day: 19}}
+          ]);
+          controller.updatePayables();
+          expect(controller.asides).toBeDefined();
+          expect(controller.asides.length).toBe(1);
+          expect(controller.asides[0].original.dueDate.format('YYYY-MM-DD')).toBe('2017-02-19');
         })
       );
 
       it('should make set-aside\'s orig payable\'s due date next year if payable has happened (year-end corner case)',
         inject(function($controller) {
-          var controller = setupController($controller, moment('2016-12-30'), []);
-          var input = {original: {month: 12, day: 29}};
-          var actual = controller.getSetAsideOriginalPayableDueDate(input).format('YYYY-MM-DD');
-          expect(actual).toBe('2017-12-29');
+          var controller = setupController($controller, moment('2016-12-30'), [
+            {subtype: 'setaside', original: {month: 12, day: 29}}
+          ]);
+          controller.updatePayables();
+          expect(controller.asides).toBeDefined();
+          expect(controller.asides.length).toBe(1);
+          expect(controller.asides[0].original.dueDate.format('YYYY-MM-DD')).toBe('2017-12-29');
         })
       );
+
     });
   });
 })();

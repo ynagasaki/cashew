@@ -131,7 +131,7 @@
 
     $scope.$on('payables.refreshed', me.updatePayables);
 
-    me.setPeriod(moment('2017-01-13'));
+    me.setPeriod(moment());
 
     me.datesArray = (function() {
       var start = moment(now).startOf('week');
