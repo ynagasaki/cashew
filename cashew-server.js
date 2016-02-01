@@ -75,6 +75,10 @@
         body.rows.forEach(function(row) {
           var payment = row.value;
           var payable = itemsMap[payment.key];
+          if (!payable) {
+            console.log('No payable found with key: ' + payment.key);
+            return;
+          }
           if (!payable.payments) {
             payable.payments = [];
           }

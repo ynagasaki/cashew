@@ -17,15 +17,3 @@ Originally cloned from https://github.com/angular/angular-seed
   * If you changed the couchdb port, you will have to edit the file to use the new port: `require('nano')('http://localhost:5984')`
   * If you changed the app name, you will have to edit the file to use the new app name: `nano.db.use('cashew')`
 * You should now be able to visit the site: http://localhost:8172
-
-## Release Notes
-
-### Version 1.0.0
-First, very basic version. You can:
-* Add monthly and yearly budget line items ("payables" and "earnables").
-  * Line items can occur on multiple dates (e.g. getting paid on the 10th and 25th of each month).
-  * Yearly payables can be split into monthly "set-aside" amounts (to help "save up").
-  * See your approximate monthly debt-to-income ratio.
-* See upcoming payables for the next 4-5 weeks, with a calendar view.
-  * Check them off to indicate that they have been paid.
-  * Yearly payables that have been "split" will show up as "set-aside" payments.

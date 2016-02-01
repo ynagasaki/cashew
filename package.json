@@ -1,7 +1,7 @@
 {
   "name": "cashew",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.1",
   "description": "A private, personal budgeting webapp",
   "repository": "https://github.com/ynagasaki/cashew.git",
   "license": "MIT",
