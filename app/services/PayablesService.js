@@ -7,11 +7,18 @@
     var serv = {};
 
     serv.payables = [];
+    serv.paymentsFrom = null;
+    serv.patmentsTo = null;
 
     serv.addToPayments = function(payable, payment) {
       var paymentDate = moment([payment.year, payment.month - 1, payment.day]);
-      var i, len = payable.payments.length;
-      var currPayment;
+      var i, len, currPayment;
+      if (!payable.payments) {
+        payable.payments = [];
+        payable.payments.push(payment);
+        return;
+      }
+      len = payable.payments.length;
       for (i = 0; i < len; i++) {
         currPayment = payable.payments[i];
         if (paymentDate.isAfter([currPayment.year, currPayment.month - 1, currPayment.day])) {
@@ -22,8 +29,11 @@
     };
 
     serv.removeFromPayments = function(payable, payment) {
-      var i, len = payable.payments.length;
-      var currPayment;
+      var i, len, currPayment;
+      if (!payable.payments) {
+        return;
+      }
+      len = payable.payments.length;
       for (i = 0; i < len; i++) {
         currPayment = payable.payments[i];
         if (currPayment._id === payment._id && currPayment._rev === payment._rev) {
@@ -34,6 +44,13 @@
     };
 
     serv.refresh = function(momentFrom, momentTo) {
+      if (!momentFrom || !momentTo) {
+        momentFrom = serv.paymentsFrom;
+        momentTo = serv.paymentsTo;
+      } else {
+        serv.paymentsFrom = momentFrom;
+        serv.paymentsTo = momentTo;
+      }
       $http.get('/api/get/payables/' + momentFrom.unix() + '/' + momentTo.unix()).then(function(result) {
         if (result.data.data) {
           serv.payables = result.data.data;
@@ -52,7 +69,7 @@
         year: dueDate.year(),
         month: dueDate.month() + 1,
         day: dueDate.date(),
-        amount: payable.amount
+        amount: (payable.remainingAmount) ? payable.remainingAmount : payable.amount
       };
       if (payable.subtype === 'setaside') {
         payment.payableInstance = {

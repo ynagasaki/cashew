@@ -209,6 +209,31 @@
         })
       );
 
+      it('should add "remainingAmount" to payables with partial payments',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var item = {
+            amount: 100,
+            payments: [ {amount: 20}, {amount: 20} ]
+          };
+          controller.calculateRemainingAmount(item);
+          expect(item.remainingAmount).toBeDefined();
+          expect(item.remainingAmount).toBe(60);
+        })
+      );
+
+      it('should NOT add "remainingAmount" to payables with no payments',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var item = {
+            amount: 100,
+            payments: []
+          };
+          controller.calculateRemainingAmount(item);
+          expect(item.remainingAmount).toBeUndefined();
+        })
+      );
+
     });
   });
 })();

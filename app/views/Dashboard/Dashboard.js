@@ -44,12 +44,15 @@
         }
       }
     };
-    me.calculateAmount = function(item) {
+    me.calculateRemainingAmount = function(item) {
       var result = item.amount;
       if (item.payments) {
         item.payments.forEach(function(payment) {
           result -= payment.amount;
         });
+        if (result < item.amount) {
+          item.remainingAmount = result;
+        }
       }
       return result;
     };
@@ -97,6 +100,7 @@
           if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
             me.payables.push(item);
             me.determinePaymentMade(item);
+            me.calculateRemainingAmount(item);
           }
         }
       });
@@ -104,6 +108,8 @@
     me.togglePaid = function(payable) {
       if (!payable.payment) {
         PayablesService.pay(payable);
+      } else {
+        PayablesService.unpay(payable);
       }
     };
     me.getPercentComplete = function(item) {
@@ -131,7 +137,7 @@
 
     $scope.$on('payables.refreshed', me.updatePayables);
 
-    me.setPeriod(moment());
+    me.setPeriod(moment().add(4, 'months'));
 
     me.datesArray = (function() {
       var start = moment(now).startOf('week');
