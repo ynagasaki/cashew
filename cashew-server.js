@@ -6,6 +6,7 @@
   var cashew_db = nano.db.use('cashew');
   var express = require('express');
   var bodyParser = require('body-parser');
+  var moment = require('moment');
   var app = express();
   var jsonParser = bodyParser.json();
 
@@ -20,7 +21,8 @@
     if (!payment) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('pay: ' + payment.lineitem_id);
+    payment.doctype = 'payment';
+    /*console.log('pay: ' + payment.key);*/
     cashew_db.insert(payment, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
@@ -30,53 +32,73 @@
     });
   });
 
-  app.get('/api/get/payables', function(req, res) {
-    console.log('get/payables');
+  app.get('/api/get/payables/:from/:to', function(req, res) {
+    var from = moment.unix(req.params.from).add(-12, 'months');
+    var to = moment.unix(req.params.to);
+    var start = [from.year(), from.month()+1, from.date(), null];
+    var end = [to.year(), to.month()+1, to.date(), {}];
+
+    /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
     cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
+        return;
       }
+
       var items = [];
-      var last_payable;
+      var itemsMap = {};
+
+      /*console.log('* Retrieved payables: ' + body.rows.length);*/
       body.rows.forEach(function(row) {
         var value = row.value;
         if (value.doctype === 'payable') {
-          console.log('  pushing payable: ' + value.name);
-          value.lineitem_id = row.key[0];
+          /*console.log('  pushing payable: ' + (value.name || value.original.name) + '\t' + value.key);*/
           items.push(value);
-          last_payable = value;
-        } else if (value.doctype === 'payment') {
-          if (!last_payable) {
-            console.log('    SKIP payment: last payable is null');
-            return;
-          }
-          if (value.lineitem_id !== last_payable.lineitem_id) {
-            console.log('    SKIP payment: last payable is incompatible: ' + last_payable.lineitem_id + ' !== ' + value.lineitem_id); 
-            return;
-          }
-          if (last_payable.month) {
-            /* handle yearly payable */
-            console.log('    prepending payment \'' + value._id + '\' to yearly payable: ' + last_payable.name);
-            if (!last_payable.payments) {
-              last_payable.payments = [];
-            }
-            last_payable.payments.unshift(value);
-          } else {
-            /* handle monthly payable */
-            console.log('    adding payment \'' + value._id + '\' to monthly payable: ' + last_payable.name);
-            last_payable.payment = value;
-          }
+          itemsMap[value.key] = value;
         }
       });
-      res.json({ data: items });
+
+      if (items.length === 0) {
+        res.json({ data: items });
+        return;
+      }
+
+      /* Get da payments */
+      var filter = {startkey: start, endkey: end};
+      cashew_db.view('app', 'payments', filter, function(err, body) {
+        if (err) {
+          res.status(500).json({ msg: 'error: could not get payments', data: err});
+          return;
+        }
+
+        /*console.log('* Retrieved payments: ' + body.rows.length);*/
+        body.rows.forEach(function(row) {
+          var payment = row.value;
+          var payable = itemsMap[payment.key];
+          if (!payable.payments) {
+            payable.payments = [];
+          }
+          payable.payments.unshift(payment);
+          if (payment.payableInstance) {
+            payable = itemsMap[payment.payableInstance.key];
+            if (!payable.payments) {
+              payable.payments = [];
+            }
+            payable.payments.unshift(payment);
+          }
+        });
+
+        res.json({ data: items });
+      });
     });
   });
 
   app.get('/api/get/line-items', function(req, res) {
-    console.log('GET');
+    /*console.log('GET');*/
     cashew_db.view('app', 'line-items', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
+        return;
       }
       var items = [];
       body.rows.forEach(function(row) {
@@ -91,7 +113,7 @@
     if (!item) {
       return res.status(400).json({ msg: 'error: no body' });
     }
-    console.log('PUT ' + item.name);
+    /*console.log('PUT ' + item.name);*/
     item.doctype = 'lineitem';
     cashew_db.insert(item, function(err, body) {
       if (err) {
@@ -103,7 +125,7 @@
   });
 
   app.delete('/api/delete/:id/:rev', function(req, res) {
-    console.log('DELETE ' + req.params.id + ' ' + req.params.rev);
+    /*console.log('DELETE ' + req.params.id + ' ' + req.params.rev);*/
     cashew_db.destroy(req.params.id, req.params.rev, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: delete failed', data: err});

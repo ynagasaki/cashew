@@ -29,6 +29,8 @@
   "dependencies": {
     "body-parser": "^1.14.1",
     "express": "^4.13.3",
+    "mocha": "^2.3.4",
+    "moment": "^2.10.6",
     "nano": "^6.1.5"
   }
 }

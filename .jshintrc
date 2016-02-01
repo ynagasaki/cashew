@@ -13,7 +13,8 @@
     "require": false,
     "exports": false,
     "process": false,
-    "emit": false
+    "emit": false,
+    "moment": false
   },
   "eqeqeq": true,
   "curly": true,
