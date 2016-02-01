@@ -8,7 +8,7 @@
 
     serv.payables = [];
 
-    serv.updatePayments = function(payable, payment) {
+    serv.addToPayments = function(payable, payment) {
       var paymentDate = moment([payment.year, payment.month - 1, payment.day]);
       var i, len = payable.payments.length;
       var currPayment;
@@ -16,6 +16,18 @@
         currPayment = payable.payments[i];
         if (paymentDate.isAfter([currPayment.year, currPayment.month - 1, currPayment.day])) {
           payable.payments.splice(i, 0, payment);
+          return;
+        }
+      }
+    };
+
+    serv.removeFromPayments = function(payable, payment) {
+      var i, len = payable.payments.length;
+      var currPayment;
+      for (i = 0; i < len; i++) {
+        currPayment = payable.payments[i];
+        if (currPayment._id === payment._id && currPayment._rev === payment._rev) {
+          payable.payments.splice(i, 1);
           return;
         }
       }
@@ -58,6 +70,7 @@
           payment._id = payload.id;
           payment._rev = payload.rev;
           payable.payment = payment;
+          serv.addToPayments(payable, payment);
         } else {
           payable.payment = null;
           console.log('failed to pay ' + payable.name + ': ' + result.data);
@@ -73,6 +86,7 @@
       $http.delete('/api/delete/' + payment._id + '/' + payment._rev, payable).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
+          serv.removeFromPayments(payable, payment);
           payable.payment = null;
         }
       }, function(result) {
