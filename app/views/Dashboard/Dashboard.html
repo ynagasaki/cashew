@@ -3,7 +3,10 @@
     <div ng-hide="dash.payables.length === 0">
       <h2 class="section-header">Upcoming Payables</h2>
       <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'">
-        <input type="checkbox" ng-checked="item.payment" ng-click="dash.togglePaid(item)">
+        <button style="border: 0; background-color: transparent; padding: 0; margin: 0;" ng-click="dash.togglePaid(item)">
+          <i class="fa fa-square-o" style="color: #aaa" ng-hide="item.payment"></i>
+          <i class="fa fa-check-square-o" style="color: #333" ng-show="item.payment"></i>
+        </button>
         <span ng-class="{'paid': item.payment}">{{item.name}}</span>
         <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}" ng-show="item.amount">
           {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}
