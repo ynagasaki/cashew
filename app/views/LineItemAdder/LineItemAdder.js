@@ -31,7 +31,7 @@
     };
     var isInvalidDate = function(d) {
       if (d.M) {
-        if (!d.D) { 
+        if (!d.D) {
           return true;
         }
         switch (parseInt(d.M)) {
@@ -63,11 +63,11 @@
 
     me.getErrorMessage = function(item) {
       var i, d, j, seen = [];
-      if (!item.name) { 
-        return "Please enter a name."; 
+      if (!item.name) {
+        return "Please enter a name.";
       }
-      if (!item.amount || parseFloat(item.amount) <= 0) { 
-        return "Please enter an amount."; 
+      if (item.amount && parseFloat(item.amount) <= 0) {
+        return "If specified, amount should be more than zero.";
       }
       if (item.period === 'mo') {
         for (i in item.dates) {
@@ -118,7 +118,11 @@
       item = {};
       item.name = me.lineItem.name;
       item.type = me.lineItem.type;
-      item.amount = Math.abs(me.lineItem.amount);
+
+      if (!!me.lineItem.amount) {
+        item.amount = Math.abs(me.lineItem.amount);
+      }
+
       item.freq = {};
       item.freq.per = me.lineItem.period;
       item.freq.on = [];
@@ -159,6 +163,10 @@
         }
       }
       return true;
+    };
+
+    me.showSplitPayableOption = function(lineItem) {
+      return lineItem.period === 'yr' && lineItem.type === 'minus' && !!lineItem.amount;
     };
 
     me.addDateToLineItem = function() {

@@ -15,7 +15,7 @@
     <label for="name" class="tip">Give it a name</label>
   </div>
   <div class="field">
-    <input name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00" required>
+    <input name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="(It varies.)">
     <label for="amt" class="tip">Amount to <span ng-show="adder.lineItem.type === 'minus'">pay</span><span ng-show="adder.lineItem.type === 'plus'">earn</span></label>
   </div>
   <div class="field">
@@ -27,7 +27,7 @@
         Yearly
       </button>
     </div>
-    <div ng-show="adder.lineItem.period === 'yr' && adder.lineItem.type === 'minus'" style="margin-top: 7px;">
+    <div ng-show="adder.showSplitPayableOption(adder.lineItem)" style="margin-top: 7px;">
       <input id="split" type="checkbox" ng-model="adder.lineItem.split"> <label for="split">Split into monthly chunks</label>
     </div>
   </div>
