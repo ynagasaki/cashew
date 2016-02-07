@@ -2,17 +2,29 @@
   <div class="pure-u-1-3">
     <div ng-hide="dash.payables.length === 0">
       <h2 class="section-header">Upcoming Payables</h2>
-      <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'">
-        <button style="border: 0; background-color: transparent; padding: 0; margin: 0;" ng-click="dash.togglePaid(item)">
+      <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'" ng-init="showEnterAmt = false">
+        <button class="transparent-bg" ng-click="dash.togglePaid(item)" ng-show="dash.hasValidAmount(item) && !showEnterAmt">
           <i class="fa fa-square-o" style="color: #aaa" ng-hide="item.payment"></i>
           <i class="fa fa-check-square-o" style="color: #333" ng-show="item.payment"></i>
         </button>
+        <button class="transparent-bg" ng-click="showEnterAmt = showEnterAmt ? false : true" ng-hide="dash.hasValidAmount(item) && !showEnterAmt">
+          <i class="fa fa-square-o" style="color: #aaa" ng-hide="showEnterAmt"></i>
+          <i class="fa fa-minus-square-o" style="color: #333" ng-show="showEnterAmt"></i>
+        </button>
+
         <span ng-class="{'paid': item.payment}">{{item.name}}</span>
-        <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}" ng-show="item.amount">
+        <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}" ng-show="dash.hasValidAmount(item)">
           {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}
           <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.split">of {{item.amount | currency}}</span>
         </span>
         <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
+
+        <div ng-show="showEnterAmt" style="margin-top: 5px;">
+          <form ng-submit="dash.togglePaid(item)" class="pure-form">
+            <input class="num_long" ng-model="item.amount" ng-focus="dash.suggestAmount(item)" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="Amount paid">
+            <button class="pure-button" ng-show="dash.hasValidAmount(item)" ng-click="showEnterAmt = false">Done</button>
+          </form>
+        </div>
       </div>
     </div>
 
@@ -57,10 +69,10 @@
                 <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
               </span>
               <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
-                <span ng-show="item.amount">
+                <span ng-show="dash.hasValidAmount(item)">
                   {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}
                 </span>
-                <span ng-hide="item.amount">
+                <span ng-hide="dash.hasValidAmount(item)">
                   {{item.name}}
                 </span>
               </span>

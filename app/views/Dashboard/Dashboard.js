@@ -26,6 +26,18 @@
       yesterday = moment(now).add(-1, 'days').endOf('day');
       aMonthLater = moment(now).add(1, 'months');
     };
+    me.suggestAmount = function(item) {
+      if (item.suggestedAmount) {
+        item.amount = item.suggestedAmount;
+      }
+    };
+    me.hasValidAmount = function(item) {
+      if (!item.amount) {
+        return false;
+      }
+      item.amount = parseFloat(item.amount);
+      return item != NaN && item.amount > 0;
+    };
     me.determinePaymentMade = function(item) {
       var isSetAside = (item.subtype === 'setaside');
       var payments = item.payments;
@@ -42,6 +54,14 @@
           item.payment = payment;
           return;
         }
+      }
+    };
+    me.determineSuggestedAmount = function(item) {
+      if (me.hasValidAmount(item)) {
+        return;
+      }
+      if (item.payments && item.payments.length > 0) {
+        item.suggestedAmount = item.payments[item.payments.length - 1].amount;
       }
     };
     me.calculateRemainingAmount = function(item) {
@@ -100,7 +120,16 @@
           if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
             me.payables.push(item);
             me.determinePaymentMade(item);
-            me.calculateRemainingAmount(item);
+            if (me.hasValidAmount(item)) {
+              me.calculateRemainingAmount(item);
+            } else {
+              /* deal with "amount-less" payables */
+              if (item.payment) {
+                /* populate amount with payment amount if payment was made */
+                item.amount = item.payment.amount;
+              }
+              me.determineSuggestedAmount(item);
+            }
           }
         }
       });

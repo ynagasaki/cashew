@@ -135,7 +135,7 @@ span.due_label {
 div.progress-bar {
   display: inline-block;
   text-decoration: none;
-  width: 80px; 
+  width: 80px;
   border-radius: 3px;
   border: solid 1px #FFD859;
 }
@@ -226,4 +226,10 @@ div.no-bg-color {
   width: 10px;
   height: 10px;
   border-radius: 5px;
+}
+.transparent-bg {
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
 }
