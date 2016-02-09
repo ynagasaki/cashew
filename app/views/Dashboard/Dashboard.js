@@ -36,7 +36,7 @@
         return false;
       }
       item.amount = parseFloat(item.amount);
-      return item != NaN && item.amount > 0;
+      return !isNaN(item.amount) && item.amount > 0;
     };
     me.determinePaymentMade = function(item) {
       var isSetAside = (item.subtype === 'setaside');
