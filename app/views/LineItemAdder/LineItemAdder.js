@@ -61,13 +61,23 @@
     me.lineItem = newLineItem();
     me.errorMessage = null;
 
+    me.preparePayable = function() {
+      me.lineItem.type = 'minus';
+    };
+
+    me.prepareEarnable = function() {
+      me.lineItem.type = 'plus';
+      me.lineItem.varies = false;
+      me.lineItem.split = false;
+    };
+
     me.getErrorMessage = function(item) {
       var i, d, j, seen = [];
       if (!item.name) {
         return "Please enter a name.";
       }
-      if (item.amount && parseFloat(item.amount) <= 0) {
-        return "If specified, amount should be more than zero.";
+      if (!item.varies && (!item.amount || parseFloat(item.amount) <= 0)) {
+        return "Amount should be more than zero.";
       }
       if (item.period === 'mo') {
         for (i in item.dates) {

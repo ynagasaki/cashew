@@ -233,3 +233,17 @@ div.no-bg-color {
   padding: 0;
   margin: 0;
 }
+.button-group {
+  display: inline-block;
+}
+.button-group button:first-child {
+  border: 1px solid #ccc;
+  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0px;
+}
+.button-group button:last-child {
+  border: 1px solid #ccc;
+  border-left: 0;
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
+}

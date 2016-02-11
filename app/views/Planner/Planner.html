@@ -8,7 +8,7 @@
       Get started managing your budget by adding line items using the form on the left.
     </p>
     <div class="metric-module" ng-hide="planner.lineItems.length===0">
-      <span style="font: normal 12pt sans-serif;">Your monthly debt vs. income</span>
+      <span style="font: normal 12pt sans-serif;">Known monthly debt vs. income</span>
       <div id="amount-graph"><div ng-repeat="part in planner.graphParts" class="graph-part" style="{{planner.getPartStyle(part)}}"></div></div>
       <div class="legend" ng-repeat="part in planner.graphParts">
         <span class="legend-icon" ng-style="{'background-color': part.color}"></span>
