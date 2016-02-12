@@ -56,12 +56,17 @@
         }
       }
     };
-    me.determineSuggestedAmount = function(item) {
-      if (me.hasValidAmount(item)) {
-        return;
+    me.handleAmountlessItem = function(item) {
+      item.isAmountless = true;
+      /* populate amount with payment amount if payment was made */
+      if (item.payment) {
+        item.amount = item.payment.amount;
       }
+      /* add a suggested amount that's just the last payment made, if available */
       if (item.payments && item.payments.length > 0) {
         item.suggestedAmount = item.payments[item.payments.length - 1].amount;
+      } else {
+        item.suggestedAmount = 0;
       }
     };
     me.calculateRemainingAmount = function(item) {
@@ -123,12 +128,7 @@
             if (me.hasValidAmount(item)) {
               me.calculateRemainingAmount(item);
             } else {
-              /* deal with "amount-less" payables */
-              if (item.payment) {
-                /* populate amount with payment amount if payment was made */
-                item.amount = item.payment.amount;
-              }
-              me.determineSuggestedAmount(item);
+              me.handleAmountlessItem(item);
             }
           }
         }
