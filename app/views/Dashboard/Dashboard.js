@@ -165,7 +165,7 @@
       return me.expandedItem === item;
     };
     me.expandItem = function(item) {
-      if (me.expandedItem != null) {
+      if (me.expandedItem !== null) {
         me.expandedItem.amount = null;
       }
       me.expandedItem = item;

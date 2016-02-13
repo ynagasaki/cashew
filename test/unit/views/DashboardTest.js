@@ -234,6 +234,64 @@
         })
       );
 
+      it('should treat payables that do not have an amount field as an amountless payable',
+        inject(function($controller) {
+          var payables = runUpdatePayables($controller, moment('2015-01-05'), [
+            {subtype: 'monthly', day: 10},
+            {subtype: 'yearly', month: 1, day: 15}
+          ]);
+          expect(payables[0].isAmountless).toBeDefined();
+          expect(payables[0].isAmountless).toBe(true);
+          expect(payables[1].isAmountless).toBeDefined();
+          expect(payables[1].isAmountless).toBe(true);
+        })
+      );
+
+      it('should not make set-aside payables amountless', inject(function($controller) {
+        var controller = setupController($controller, moment('2016-02-20'), [
+          {subtype: 'setaside', original: {month: 2, day: 19}}
+        ]);
+        controller.updatePayables();
+        expect(controller.asides).toBeDefined();
+        expect(controller.asides.length).toBe(1);
+        expect(controller.asides[0].isAmountless).toBeUndefined();
+      }));
+
+      it('should set amount of amountless payable to be payment amount, only if payment exists',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var item = {
+            payment: {amount: 123},
+            payments: [{amount: 123}]
+          };
+          controller.handleAmountlessItem(item);
+          expect(item.amount).toBeDefined();
+          expect(item.amount).toBe(123);
+
+          item = { payments: [] };
+          controller.handleAmountlessItem(item);
+          expect(item.amount).toBeUndefined();
+        })
+      );
+
+      it('should set suggested amount of amountless payable to be last payment amount, only if payments exist',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var item = {
+            payment: {amount: 123},
+            payments: [{amount: 245}]
+          };
+          controller.handleAmountlessItem(item);
+          expect(item.suggestedAmount).toBeDefined();
+          expect(item.suggestedAmount).toBe(245);
+
+          item = { payments: [] };
+          controller.handleAmountlessItem(item);
+          expect(item.suggestedAmount).toBeDefined();
+          expect(item.suggestedAmount).toBe(0);
+        })
+      );
+
     });
   });
 })();

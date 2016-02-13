@@ -64,6 +64,27 @@
           expect(item.payments[0].month).toBe(12);
         })
       );
+
+      it('should remove amount and suggestedAmount fields if item is amountless',
+        inject(function($httpBackend, PayablesService) {
+          expect(PayablesService.removeFromPayments).toBeDefined();
+          expect($httpBackend).toBeDefined();
+
+          $httpBackend.expect('DELETE', /\/api\/delete\/(.+)\/(.+)/).respond(
+            function(method, url, data, headers, params) {
+              return [200, { data: { ok: true } }];
+            }
+          );
+
+          var item = { payment: { amount: 123 }, amount: 123, suggestedAmount: 345, isAmountless: true };
+          PayablesService.unpay(item);
+
+          $httpBackend.flush();
+
+          expect(item.amount).toBe(null);
+          expect(item.suggestedAmount).toBe(null);
+        })
+      );
     });
   });
 })();
