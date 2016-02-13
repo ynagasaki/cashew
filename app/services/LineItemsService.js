@@ -10,6 +10,7 @@
 
     serv.put = function(item) {
       var me = this;
+      item.startDate = moment().startOf('day');
       $http.put('/api/put/line-item', item).then(function (result) {
         var payload = result.data.data;
         if (payload.ok) {
@@ -52,7 +53,7 @@
         console.log("failed to remove: " + result.data);
       });
     };
-    
+
     return serv;
   }]);
 })();
