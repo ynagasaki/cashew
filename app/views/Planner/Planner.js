@@ -39,11 +39,17 @@
       if (earn_amt > 0) {
         var debt_width = Math.round(debt_amt / earn_amt * 100);
         var aside_width = Math.round(aside_amt / earn_amt * 100);
-        return [
-          {name: 'Monthly payments', color: '#FF4747', width: debt_width},
-          {name: 'Monthly set-asides', color: '#FFDD45', width: aside_width},
-          {name: 'Monthly earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)}
-        ];
+        var result = [];
+
+        if (debt_amt > 0) {
+          result.push({name: 'Monthly payments', color: '#FF4747', width: debt_width});
+        }
+        if (aside_amt > 0) {
+          result.push({name: 'Monthly set-asides', color: '#FFDD45', width: aside_width});
+        }
+        result.push({name: 'Monthly earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)});
+
+        return result;
       }
       if (countedItems === 0) {
         return [ {name: 'No data', color: '#EEE', width: 100} ];
