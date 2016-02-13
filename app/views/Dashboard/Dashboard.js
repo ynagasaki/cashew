@@ -20,11 +20,24 @@
 
     me.asides = [];
     me.payables = [];
+    me.expandedItem = null;
 
     me.setPeriod = function(val) {
       now = moment(val).startOf('day');
       yesterday = moment(now).add(-1, 'days').endOf('day');
       aMonthLater = moment(now).add(1, 'months');
+    };
+    me.suggestAmount = function(item) {
+      if (item.suggestedAmount) {
+        item.amount = item.suggestedAmount;
+      }
+    };
+    me.hasValidAmount = function(item) {
+      if (!item.amount) {
+        return false;
+      }
+      item.amount = parseFloat(item.amount);
+      return !isNaN(item.amount) && item.amount > 0;
     };
     me.determinePaymentMade = function(item) {
       var isSetAside = (item.subtype === 'setaside');
@@ -42,6 +55,19 @@
           item.payment = payment;
           return;
         }
+      }
+    };
+    me.handleAmountlessItem = function(item) {
+      item.isAmountless = true;
+      /* populate amount with payment amount if payment was made */
+      if (item.payment) {
+        item.amount = item.payment.amount;
+      }
+      /* add a suggested amount that's just the last payment made, if available */
+      if (item.payments && item.payments.length > 0) {
+        item.suggestedAmount = item.payments[item.payments.length - 1].amount;
+      } else {
+        item.suggestedAmount = 0;
       }
     };
     me.calculateRemainingAmount = function(item) {
@@ -100,7 +126,11 @@
           if (item.dueDate && item.dueDate.isBetween(yesterday, aMonthLater)) {
             me.payables.push(item);
             me.determinePaymentMade(item);
-            me.calculateRemainingAmount(item);
+            if (me.hasValidAmount(item)) {
+              me.calculateRemainingAmount(item);
+            } else {
+              me.handleAmountlessItem(item);
+            }
           }
         }
       });
@@ -130,6 +160,15 @@
         });
       }
       return Math.round(result / total * 100);
+    };
+    me.isExpanded = function(item) {
+      return me.expandedItem === item;
+    };
+    me.expandItem = function(item) {
+      if (me.expandedItem !== null) {
+        me.expandedItem.amount = null;
+      }
+      me.expandedItem = item;
     };
     me.getNow = function() {
       return now;

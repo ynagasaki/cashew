@@ -135,7 +135,7 @@ span.due_label {
 div.progress-bar {
   display: inline-block;
   text-decoration: none;
-  width: 80px; 
+  width: 80px;
   border-radius: 3px;
   border: solid 1px #FFD859;
 }
@@ -226,4 +226,24 @@ div.no-bg-color {
   width: 10px;
   height: 10px;
   border-radius: 5px;
+}
+.transparent-bg {
+  border: 0;
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+}
+.button-group {
+  display: inline-block;
+}
+.button-group button:first-child {
+  border: 1px solid #ccc;
+  border-bottom-right-radius: 0px;
+  border-top-right-radius: 0px;
+}
+.button-group button:last-child {
+  border: 1px solid #ccc;
+  border-left: 0;
+  border-bottom-left-radius: 0px;
+  border-top-left-radius: 0px;
 }

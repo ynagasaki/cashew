@@ -105,6 +105,10 @@
         if (payload.ok) {
           serv.removeFromPayments(payable, payment);
           payable.payment = null;
+          if (payable.isAmountless) {
+            payable.amount = null;
+            payable.suggestedAmount = null;
+          }
         }
       }, function(result) {
         console.log('failed to unpay ' + payable.name + ': ' + result.data);
