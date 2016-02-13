@@ -20,6 +20,7 @@
 
     me.asides = [];
     me.payables = [];
+    me.expandedItem = null;
 
     me.setPeriod = function(val) {
       now = moment(val).startOf('day');
@@ -159,6 +160,15 @@
         });
       }
       return Math.round(result / total * 100);
+    };
+    me.isExpanded = function(item) {
+      return me.expandedItem === item;
+    };
+    me.expandItem = function(item) {
+      if (me.expandedItem != null) {
+        me.expandedItem.amount = null;
+      }
+      me.expandedItem = item;
     };
     me.getNow = function() {
       return now;
