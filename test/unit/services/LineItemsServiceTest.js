@@ -7,7 +7,7 @@
     });
 
     describe('LineItemsService', function() {
-      it('should assign today\'s date as the start date of new line items',
+      it('should assign today\'s date (as unix timestamp) as the start date of new line items',
         inject(function($httpBackend, LineItemsService) {
           expect(LineItemsService).toBeDefined();
           expect($httpBackend).toBeDefined();
@@ -26,8 +26,7 @@
           expect(item._id).toBe('bla');
           expect(item._rev).toBe('fest');
           expect(item.startDate).toBeDefined();
-          expect(item.startDate.format).toBeDefined();
-          expect(item.startDate.format('YYYY-MM-DD')).toBe(moment().startOf('day').format('YYYY-MM-DD'));
+          expect(item.startDate).toBe(moment().startOf('day').unix());
         })
       );
     });

@@ -7,17 +7,17 @@
 
   describe('cashew server', function() {
     var LINEITEMS = [
-      { name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
-      { name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} },
-      { name: '(test-3)', type: 'minus', amount: 345, freq: {per: 'yr', on: [{M: 5, D: 23}], split: true} }
+      { doctype: 'lineitem', name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
+      { doctype: 'lineitem', name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} },
+      { doctype: 'lineitem', name: '(test-3)', type: 'minus', amount: 345, freq: {per: 'yr', on: [{M: 5, D: 23}], split: true} }
     ];
     var PAYMENTS = [
       [
-        { year: 2016, month: 1, day: 15},
-        { year: 2016, month: 2, day: 15}
+        { doctype: 'payment', year: 2016, month: 1, day: 15},
+        { doctype: 'payment', year: 2016, month: 2, day: 15}
       ],
       [
-        { year: 2016, month: 3, day: 16}
+        { doctype: 'payment', year: 2016, month: 3, day: 16}
       ],
       []
     ];
@@ -96,7 +96,7 @@
     });
 
     it('should get the test line item(s)', function(done) {
-      UTILS.request('get', 'api/get/line-items', function(result) {
+      UTILS.request('get', 'api/get/line-items/' + moment().unix(), function(result) {
         assert.equal(result.data.length, LINEITEMS.length);
 
         matchRetrievedByName(result.data);

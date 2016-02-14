@@ -18,7 +18,7 @@
     </div>
     <div class="lineItem removable" ng-repeat="item in planner.lineItems">
       <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
-      <span class="name">{{item.name}}</span>
+      <span class="name">{{item.name}} {{item._rev}}</span>
       <span ng-show="item.amount">
         in the amount of
         <span class="amount">{{item.amount | currency}}</span>
@@ -31,10 +31,10 @@
       </span>
       <div ng-init="showConfirm = false" ng-mouseleave="showConfirm = false" style="display: inline-block;">
         <button type="button" class="pure-button showOnHover" ng-hide="showConfirm" ng-click="showConfirm = true">
-          <i class="fa fa-trash-o"></i>
+          <i class="fa fa-times-circle"></i> Close item
         </button>
-        <button type="button" class="button-warning pure-button" ng-show="showConfirm" ng-click="planner.removeLineItem(item)">
-          <i class="fa fa-exclamation-triangle"></i> Confirm delete
+        <button type="button" class="button-warning pure-button" ng-show="showConfirm" ng-click="planner.closeLineItem(item)">
+          <i class="fa fa-exclamation-triangle"></i> Confirm close
         </button>
       </div>
     </div>
