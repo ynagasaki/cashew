@@ -7,18 +7,20 @@
 
   describe('cashew server', function() {
     var LINEITEMS = [
-      { name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
-      { name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} },
-      { name: '(test-3)', type: 'minus', amount: 345, freq: {per: 'yr', on: [{M: 5, D: 23}], split: true} }
+      { doctype: 'lineitem', name: '(test-1)', type: 'minus', amount: 123, freq: {per: 'mo', on: [{D: 15}]} },
+      { doctype: 'lineitem', name: '(test-2)', type: 'minus', amount: 234, freq: {per: 'mo', on: [{D: 16}]} },
+      { doctype: 'lineitem', name: '(test-3)', type: 'minus', amount: 345, freq: {per: 'yr', on: [{M: 5, D: 23}], split: true} },
+      { doctype: 'lineitem', name: '(test-4)', type: 'minus', amount: 111, freq: {per: 'mo', on: [{D: 17}]}, endDate: moment('1990-01-01').unix() }
     ];
     var PAYMENTS = [
       [
-        { year: 2016, month: 1, day: 15},
-        { year: 2016, month: 2, day: 15}
+        { doctype: 'payment', year: 2016, month: 1, day: 15},
+        { doctype: 'payment', year: 2016, month: 2, day: 15}
       ],
       [
-        { year: 2016, month: 3, day: 16}
+        { doctype: 'payment', year: 2016, month: 3, day: 16}
       ],
+      [],
       []
     ];
     var matchRetrievedByName = function(retrieved) {
@@ -95,19 +97,50 @@
       });
     });
 
-    it('should get the test line item(s)', function(done) {
-      UTILS.request('get', 'api/get/line-items', function(result) {
-        assert.equal(result.data.length, LINEITEMS.length);
+    it('should get the test line item(s), except closed ones', function(done) {
+      var lineItemCutoffDate = moment();
+      UTILS.request('get', 'api/get/line-items/' + lineItemCutoffDate.unix(), function(result) {
+        var numClosed = 0;
+
+        LINEITEMS.forEach(function(item) {
+          if (item.endDate && lineItemCutoffDate.isAfter(moment.unix(item.endDate))) {
+            numClosed ++;
+          }
+        });
+
+        assert.equal(result.data.length, LINEITEMS.length - numClosed);
 
         matchRetrievedByName(result.data);
 
         LINEITEMS.forEach(function(item) {
+          if (item.endDate && lineItemCutoffDate.isAfter(moment.unix(item.endDate))) {
+            return;
+          }
           assert(item.retrieved, 'Expected test line-item "' + item.name + '" to be retrieved.');
           assert.equal(item.retrieved.type, item.type);
           assert.equal(item.retrieved.amount, item.amount);
           assert.equal(item.retrieved.doctype, 'lineitem');
         });
 
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should not get closed item on the date it was closed', function(done) {
+      var lineItemCutoffDate = moment('1990-01-01');
+      UTILS.request('get', 'api/get/line-items/' + lineItemCutoffDate.unix(), function(result) {
+        var theClosedItemAccordingToCutoffDate = 0;
+
+        LINEITEMS.forEach(function(item) {
+          if (item.endDate && lineItemCutoffDate.isSame(moment.unix(item.endDate))) {
+            theClosedItemAccordingToCutoffDate ++;
+          }
+        });
+
+        assert.equal(result.data.length, LINEITEMS.length - theClosedItemAccordingToCutoffDate);
         done();
       }, function() {
         assert.fail();
@@ -246,6 +279,39 @@
         assert.equal(item.doctype, 'payable');
         assert.equal(item.key, [LINEITEMS[2].id, 'SA', 23, 5].join('_'));
 
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should reject payments that don\'t have doctype=payment set', function(done) {
+      UTILS.requestJson('put', 'api/pay', {}, function(res) {
+        assert(res.msg, 'expected a message');
+        assert.equal(res.msg, 'error: expected doctype=payment');
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should reject line-items that don\'t have doctype=lineitem set', function(done) {
+      UTILS.requestJson('put', 'api/put/line-item', {}, function(res) {
+        assert(res.msg, 'expected a message');
+        assert.equal(res.msg, 'error: expected doctype=lineitem');
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
+
+    it('should reject updating line-items that don\'t have _id and _rev set', function(done) {
+      UTILS.requestJson('put', 'api/update/line-item', {}, function(res) {
+        assert(res.msg, 'expected a message');
+        assert.equal(res.msg, 'expected _id (undefined) and _rev (undefined) fields');
         done();
       }, function() {
         assert.fail();

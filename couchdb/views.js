@@ -5,14 +5,14 @@
     'line-items': {
       map: function(doc) {
         if (doc.doctype === 'lineitem') {
-          emit(doc._id, doc);
+          emit([(!doc.endDate) ? {} : doc.endDate, doc.startDate, doc._id], doc);
         }
       }
     },
     'payables': {
       map: function(doc) {
         var payable, date, key;
-        if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq) {
+        if (doc.doctype === 'lineitem' && doc.type === 'minus' && doc.freq && !doc.endDate) {
           for (var i = 0; i < doc.freq.on.length; ++i) {
             date = doc.freq.on[i];
             payable = {

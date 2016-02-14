@@ -65,6 +65,7 @@
       /* Create a payment based on this payable */
       var dueDate = payable.dueDate;
       var payment = {
+        doctype: 'payment',
         key: payable.key,
         year: dueDate.year(),
         month: dueDate.month() + 1,

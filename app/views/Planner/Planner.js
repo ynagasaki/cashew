@@ -63,6 +63,9 @@
       me.lineItems = LineItemsService.lineItems;
       me.graphParts = getMonthlyAmountGraphParts(me.lineItems);
     };
+    me.closeLineItem = function(item) {
+      LineItemsService.close(item);
+    };
     me.removeLineItem = function(item) {
       LineItemsService.remove(item);
     };
@@ -73,7 +76,8 @@
     $scope.$on('lineitems.added', me.updateLineItems);
     $scope.$on('lineitems.refreshed', me.updateLineItems);
     $scope.$on('lineitems.removed', me.updateLineItems);
+    $scope.$on('lineitems.updated', me.updateLineItems);
 
-    LineItemsService.refresh();
+    LineItemsService.refresh(moment().startOf('day'));
   }]);
 })();

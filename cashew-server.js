@@ -20,8 +20,9 @@
     var payment = req.body;
     if (!payment) {
       return res.status(400).json({ msg: 'error: no body' });
+    } else if (!payment.doctype || payment.doctype !== 'payment') {
+      return res.status(400).json({ msg: 'error: expected doctype=payment' });
     }
-    payment.doctype = 'payment';
     /*console.log('pay: ' + payment.key);*/
     cashew_db.insert(payment, function(err, body) {
       if (err) {
@@ -97,15 +98,18 @@
     });
   });
 
-  app.get('/api/get/line-items', function(req, res) {
-    /*console.log('GET');*/
-    cashew_db.view('app', 'line-items', function(err, body) {
+  app.get('/api/get/line-items/:from', function(req, res) {
+    var from = moment.unix(req.params.from).add(1, 'seconds').unix();
+    var filter = {startkey: [from, null, null]};
+    /*console.log('GET from: ' + from);*/
+    cashew_db.view('app', 'line-items', filter, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
         return;
       }
       var items = [];
       body.rows.forEach(function(row) {
+        /* console.log('   GOT: ' + row.value.name); */
         items.push(row.value);
       });
       res.json({ data: items });
@@ -116,15 +120,35 @@
     var item = req.body;
     if (!item) {
       return res.status(400).json({ msg: 'error: no body' });
+    } else if (!item.doctype || item.doctype !== 'lineitem') {
+      return res.status(400).json({ msg: 'error: expected doctype=lineitem' });
     }
-    /*console.log('PUT ' + item.name);*/
-    item.doctype = 'lineitem';
+    /* console.log('PUT ' + item.name); */
     cashew_db.insert(item, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: save failed', data: err });
         return;
       }
+      /*console.log('   SUCCESS ' + item.name);*/
       res.json({ msg: 'inserted', data: body });
+    });
+  });
+
+  app.put('/api/update/line-item', jsonParser, function(req, res) {
+    var item = req.body;
+    if (!item) {
+      return res.status(400).json({msg: 'error: no body'});
+    } else if (!item._id || !item._rev) {
+      return res.status(400).json({msg: 'expected _id (' + item._id + ') and _rev (' + item._rev + ') fields'});
+    }
+    /* console.log('UPDATE ' + item.name); */
+    cashew_db.insert(item, function(err) {
+      if (err) {
+        res.status(500).json({msg: 'error: update failed', data: err});
+        return;
+      }
+      /*console.log('   SUCCESS ' + item.name);*/
+      res.json({ msg: 'updated' });
     });
   });
 
