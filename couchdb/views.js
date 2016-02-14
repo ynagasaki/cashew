@@ -5,7 +5,7 @@
     'line-items': {
       map: function(doc) {
         if (doc.doctype === 'lineitem') {
-          emit(doc._id, doc);
+          emit([(!doc.endDate) ? {} : doc.endDate, doc.startDate, doc._id], doc);
         }
       }
     },

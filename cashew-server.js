@@ -99,10 +99,10 @@
   });
 
   app.get('/api/get/line-items/:from', function(req, res) {
-    var from = moment.unix(req.params.from);
-    /*var filter = {startkey: start, endkey: end};*/
-    /*console.log('GET from: ' + from.format('YYYY-MM-DD'));*/
-    cashew_db.view('app', 'line-items', function(err, body) {
+    var from = moment.unix(req.params.from).add(1, 'seconds').unix();
+    var filter = {startkey: [from, null, null]};
+    /*console.log('GET from: ' + from);*/
+    cashew_db.view('app', 'line-items', filter, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
         return;
@@ -110,9 +110,7 @@
       var items = [];
       body.rows.forEach(function(row) {
         /* console.log('   GOT: ' + row.value.name); */
-        if (!row.value.endDate || moment.unix(row.value.endDate).isAfter(from)) {
-          items.push(row.value);
-        }
+        items.push(row.value);
       });
       res.json({ data: items });
     });

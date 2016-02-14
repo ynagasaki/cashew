@@ -18,7 +18,7 @@
     </div>
     <div class="lineItem removable" ng-repeat="item in planner.lineItems">
       <i ng-class="'fa fa-' + item.type + '-circle ' + item.type"></i>
-      <span class="name">{{item.name}} {{item._rev}}</span>
+      <span class="name">{{item.name}}</span>
       <span ng-show="item.amount">
         in the amount of
         <span class="amount">{{item.amount | currency}}</span>

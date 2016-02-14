@@ -78,6 +78,6 @@
     $scope.$on('lineitems.removed', me.updateLineItems);
     $scope.$on('lineitems.updated', me.updateLineItems);
 
-    LineItemsService.refresh(moment());
+    LineItemsService.refresh(moment().startOf('day'));
   }]);
 })();
