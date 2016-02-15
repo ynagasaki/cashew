@@ -1,5 +1,5 @@
 <div class="pure-g">
-  <div class="pure-u-1-3">
+  <div class="pure-u-1 pure-u-md-1-3">
     <div ng-hide="dash.payables.length === 0">
       <h2 class="section-header">Upcoming Payables</h2>
       <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'">
@@ -11,14 +11,12 @@
           <i class="fa fa-square-o" style="color: #aaa" ng-hide="dash.isExpanded(item)"></i>
           <i class="fa fa-close" style="color: #333" ng-show="dash.isExpanded(item)"></i>
         </button>
-
         <span ng-class="{'paid': item.payment}">{{item.name}}</span>
         <span ng-class="{'amount_label_paid paid' : item.payment, 'amount_label' : !item.payment}" ng-show="dash.hasValidAmount(item)">
           {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}
           <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.split">of {{item.amount | currency}}</span>
         </span>
         <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
-
         <div ng-show="dash.isExpanded(item)" style="margin-top: 5px;">
           <form ng-submit="dash.togglePaid(item)" class="pure-form">
             <input class="num_long" ng-model="item.amount" ng-focus="dash.suggestAmount(item)" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="Amount paid">
@@ -27,7 +25,6 @@
         </div>
       </div>
     </div>
-
     <div ng-hide="dash.asides.length === 0">
       <h2 class="section-header">{{dash.getNow().toDate() | date: 'MMMM'}} Set-Asides</h2>
       <div class="upcoming_lineitems" ng-repeat="item in dash.asides | orderBy: 'original.dueDate'">
@@ -42,13 +39,12 @@
         </div>
       </div>
     </div>
-
     <p ng-show="dash.payables.length + dash.asides.length === 0" style="padding: 10px;">
       No payables? Manage line items on <a href="#/line-items">the Planning page</a>.
     </p>
   </div>
-  <div class="pure-u-2-3">
-    <div>
+  <div class="pure-u-1 pure-u-md-2-3">
+    <div class="hide-lt-md">
       <table id="calendar" class="pure-table pure-table-bordered">
         <thead>
           <tr>
@@ -64,10 +60,8 @@
         <tbody>
           <tr ng-repeat="week in dash.datesArray">
             <td ng-repeat="d in week" ng-class="{'out_of_range': dash.isOutOfRange(d)}">
-              <span ng-class="{'today' : dash.isToday(d)}">
-                <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
-                <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
-              </span>
+              <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
+              <span ng-class="{'today' : dash.isToday(d)}" style="font-size: 10pt;">{{ d | date: 'd' }}</span>
               <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
                 <span ng-show="dash.hasValidAmount(item)">
                   {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}
