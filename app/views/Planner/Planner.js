@@ -42,12 +42,12 @@
         var result = [];
 
         if (debt_amt > 0) {
-          result.push({name: 'Monthly payments', color: '#FF4747', width: debt_width});
+          result.push({name: 'Payments', color: '#FF4747', width: debt_width});
         }
         if (aside_amt > 0) {
-          result.push({name: 'Monthly set-asides', color: '#FFDD45', width: aside_width});
+          result.push({name: 'Set-asides', color: '#FFDD45', width: aside_width});
         }
-        result.push({name: 'Monthly earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)});
+        result.push({name: 'Earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)});
 
         return result;
       }

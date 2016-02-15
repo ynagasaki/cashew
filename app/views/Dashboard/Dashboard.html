@@ -44,7 +44,7 @@
     </p>
   </div>
   <div class="pure-u-1 pure-u-md-2-3">
-    <div style="overflow: hidden;">
+    <div class="hide-lt-md">
       <table id="calendar" class="pure-table pure-table-bordered">
         <thead>
           <tr>
@@ -60,10 +60,8 @@
         <tbody>
           <tr ng-repeat="week in dash.datesArray">
             <td ng-repeat="d in week" ng-class="{'out_of_range': dash.isOutOfRange(d)}">
-              <span ng-class="{'today' : dash.isToday(d)}">
-                <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
-                <span style="font-size: 10pt;">{{ d | date: 'd' }}</span>
-              </span>
+              <span ng-show="$parent.$index === 0 && $index === 0 || d.getDate() === 1" class="month_label">{{ d | date: 'MMM' }}</span>
+              <span ng-class="{'today' : dash.isToday(d)}" style="font-size: 10pt;">{{ d | date: 'd' }}</span>
               <span ng-repeat="item in dash.payablesOn(d)" ng-class="{'amount_label_paid' : item.payment, 'amount_label' : !item.payment}">
                 <span ng-show="dash.hasValidAmount(item)">
                   {{(item.remainingAmount ? item.remainingAmount : item.amount) | currency}}

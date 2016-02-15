@@ -247,3 +247,8 @@ div.no-bg-color {
   border-bottom-left-radius: 0px;
   border-top-left-radius: 0px;
 }
+@media screen and (max-width: 48em) {
+  .hide-lt-md {
+    display: none;
+  }
+}
