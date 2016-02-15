@@ -16,7 +16,7 @@
   </div>
   <div class="field">
     <label for="amt" class="tip">Amount to <span ng-show="adder.lineItem.type === 'minus'">pay</span><span ng-show="adder.lineItem.type === 'plus'">earn</span></label>
-    <input ng-disabled="adder.lineItem.varies" name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="0.00">
+    <input ng-disabled="adder.lineItem.varies" name="amt" class="num_long" ng-model="adder.lineItem.amount" ng-model-options="{ debounce: 200 }" type="text" pattern="[0-9]+(\.[0-9][0-9])?" placeholder="0.00">
     <div ng-show="adder.lineItem.type === 'minus'" style="margin-top: 7px;">
       <input name="varies" type="checkbox" ng-model="adder.lineItem.varies" ng-click="adder.lineItem.amount = null"> It varies
     </div>

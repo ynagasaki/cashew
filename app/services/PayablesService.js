@@ -89,6 +89,10 @@
           payment._rev = payload.rev;
           payable.payment = payment;
           serv.addToPayments(payable, payment);
+          if (payable.isAmountless) {
+            payable.amount = payment.amount;
+            payable.suggestedAmount = payment.amount;
+          }
         } else {
           payable.payment = null;
           console.log('failed to pay ' + payable.name + ': ' + result.data);

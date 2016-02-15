@@ -17,11 +17,9 @@
           <span style="color: #FFBFCB; font-size: 9pt;" ng-show="item.split">of {{item.amount | currency}}</span>
         </span>
         <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
-        <div ng-show="dash.isExpanded(item)" style="margin-top: 5px;">
-          <form ng-submit="dash.togglePaid(item)" class="pure-form">
-            <input class="num_long" ng-model="item.amount" ng-focus="dash.suggestAmount(item)" type="text" pattern="[0-9]+\.?[0-9]?[0-9]?" placeholder="Amount paid">
-            <button class="pure-button" ng-show="dash.hasValidAmount(item)" ng-click="dash.expandItem(null)">Done</button>
-          </form>
+        <div ng-show="dash.isExpanded(item)" style="margin-top: 5px;" class="pure-form">
+          <input class="num_long" ng-model="item.amount" ng-focus="dash.suggestAmount(item)" type="text" pattern="[0-9]+(\.[0-9][0-9])?" placeholder="Amount paid">
+          <button class="pure-button" ng-show="dash.hasValidAmount(item)" ng-click="dash.togglePaid(item); dash.expandItem(null)">Done</button>
         </div>
       </div>
     </div>
