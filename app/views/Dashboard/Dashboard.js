@@ -137,6 +137,7 @@
     };
     me.togglePaid = function(payable) {
       if (!payable.payment) {
+        payable.amount = parseFloat(payable.amount);
         PayablesService.pay(payable);
       } else {
         PayablesService.unpay(payable);

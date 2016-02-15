@@ -65,9 +65,9 @@
         })
       );
 
-      it('should remove amount and suggestedAmount fields if item is amountless',
+      it('should remove amount and suggestedAmount fields upon unpaying, if item is amountless',
         inject(function($httpBackend, PayablesService) {
-          expect(PayablesService.removeFromPayments).toBeDefined();
+          expect(PayablesService.unpay).toBeDefined();
           expect($httpBackend).toBeDefined();
 
           $httpBackend.expect('DELETE', /\/api\/delete\/(.+)\/(.+)/).respond(
@@ -83,6 +83,29 @@
 
           expect(item.amount).toBe(null);
           expect(item.suggestedAmount).toBe(null);
+        })
+      );
+
+      it('should set amount and suggestedAmount fields upon paying, if item is amountless',
+        inject(function($httpBackend, PayablesService) {
+          expect(PayablesService.pay).toBeDefined();
+          expect($httpBackend).toBeDefined();
+
+          $httpBackend.expect('PUT', /\/api\/pay/).respond(
+            function(method, url, data, headers, params) {
+              return [200, { data: { ok: true } }];
+            }
+          );
+
+          var item = { amount: 123, isAmountless: true, dueDate: moment(), subtype: 'monthly', key: 'lol' };
+          PayablesService.pay(item);
+
+          $httpBackend.flush();
+
+          expect(item.amount).toBeDefined();
+          expect(item.suggestedAmount).toBeDefined();
+          expect(item.amount).toBe(123);
+          expect(item.suggestedAmount).toBe(123);
         })
       );
     });
