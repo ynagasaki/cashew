@@ -292,6 +292,31 @@
         })
       );
 
+      it('should fill in trailing zeros for the inputAmt strings',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var testCases = {
+            '123.45' : 123.45,
+            '123.40' : 123.4,
+            '123' : 123.0,
+            '12.70' : 12.7,
+            '1.10' : 1.1,
+            '0.50' : .5,
+            '0.51' : .51,
+            '34523627.20' : 34523627.2
+          };
+          var item, expected;
+
+          for (expected in testCases) {
+            item = {
+              suggestedAmount: testCases[expected]
+            };
+            controller.suggestAmount(item);
+            expect(item.inputAmt).toBeDefined();
+            expect(item.inputAmt).toBe(expected);
+          }
+        })
+      );
     });
   });
 })();

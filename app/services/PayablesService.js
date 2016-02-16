@@ -89,6 +89,7 @@
           payment._rev = payload.rev;
           payable.payment = payment;
           serv.addToPayments(payable, payment);
+          /* not strictly necessary but just in case */
           if (payable.isAmountless) {
             payable.amount = payment.amount;
             payable.suggestedAmount = payment.amount;

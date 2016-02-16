@@ -3,11 +3,11 @@
     <div ng-hide="dash.payables.length === 0">
       <h2 class="section-header">Upcoming Payables</h2>
       <div class="upcoming_lineitems" ng-repeat="item in dash.payables | orderBy: 'dueDate'">
-        <button class="transparent-bg" ng-click="dash.togglePaid(item)" ng-show="dash.hasValidAmount(item) && !dash.isExpanded(item)">
+        <button class="transparent-bg" ng-click="dash.togglePaid(item)" ng-show="!dash.isExpanded(item) && dash.hasValidAmount(item)">
           <i class="fa fa-square-o" style="color: #aaa" ng-hide="item.payment"></i>
           <i class="fa fa-check-square-o" style="color: #333" ng-show="item.payment"></i>
         </button>
-        <button class="transparent-bg" ng-click="dash.expandItem(dash.isExpanded(item) ? null : item)" ng-hide="dash.hasValidAmount(item) && !dash.isExpanded(item)">
+        <button class="transparent-bg" ng-click="dash.expandItem(dash.isExpanded(item) ? null : item)" ng-hide="!dash.isExpanded(item) && dash.hasValidAmount(item)">
           <i class="fa fa-square-o" style="color: #aaa" ng-hide="dash.isExpanded(item)"></i>
           <i class="fa fa-close" style="color: #333" ng-show="dash.isExpanded(item)"></i>
         </button>
@@ -18,8 +18,8 @@
         </span>
         <span class="due_label">{{item.dueDate.toDate() | date: 'MMM d'}}</span>
         <div ng-show="dash.isExpanded(item)" style="margin-top: 5px;" class="pure-form">
-          <input class="num_long" ng-model="item.amount" ng-focus="dash.suggestAmount(item)" type="text" pattern="[0-9]+(\.[0-9][0-9])?" placeholder="Amount paid">
-          <button class="pure-button" ng-show="dash.hasValidAmount(item)" ng-click="dash.togglePaid(item); dash.expandItem(null)">Done</button>
+          <input class="num_long" ng-model="item.inputAmt" pattern="[0-9]+(\.[0-9][0-9])?" type="text" placeholder="Amount paid">
+          <button class="pure-button" ng-show="dash.isValidAmount(item.inputAmt)" ng-click="dash.payAmountlessItem(item)">Done</button>
         </div>
       </div>
     </div>

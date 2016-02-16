@@ -29,15 +29,28 @@
     };
     me.suggestAmount = function(item) {
       if (item.suggestedAmount) {
-        item.amount = item.suggestedAmount;
+        var sugAmt = item.suggestedAmount.toString();
+        var len = sugAmt.length - 3;
+        var dotPos = sugAmt.indexOf('.');
+        while (dotPos > len) {
+          sugAmt = sugAmt + '0';
+          dotPos --;
+        }
+        item.inputAmt = sugAmt;
       }
     };
     me.hasValidAmount = function(item) {
       if (!item.amount) {
         return false;
       }
-      var amt = parseFloat(item.amount);
-      return !isNaN(amt) && amt > 0;
+      return me.isValidAmount(item.amount);
+    };
+    me.isValidAmount = function(amt) {
+      if (!amt) {
+        return false;
+      }
+      var parsedAmt = parseFloat(amt);
+      return !isNaN(parsedAmt) && parsedAmt > 0;
     };
     me.determinePaymentMade = function(item) {
       var isSetAside = (item.subtype === 'setaside');
@@ -137,7 +150,6 @@
     };
     me.togglePaid = function(payable) {
       if (!payable.payment) {
-        payable.amount = parseFloat(payable.amount);
         PayablesService.pay(payable);
       } else {
         PayablesService.unpay(payable);
@@ -167,9 +179,19 @@
     };
     me.expandItem = function(item) {
       if (me.expandedItem !== null) {
-        me.expandedItem.amount = null;
+        me.expandedItem.inputAmt = null;
       }
       me.expandedItem = item;
+      if (item !== null) {
+        me.suggestAmount(me.expandedItem);
+      }
+    };
+    me.payAmountlessItem = function(item) {
+      if (item.inputAmt) {
+        item.amount = parseFloat(item.inputAmt);
+        me.togglePaid(item);
+        me.expandItem(null);
+      }
     };
     me.getNow = function() {
       return now;
