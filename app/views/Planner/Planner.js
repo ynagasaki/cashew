@@ -56,11 +56,17 @@
       }
       return [ {name: 'All debt :(', color: '#FF4747', width: 100} ];
     };
+    var processLineItems = function(lineItems) {
+      lineItems.forEach(function(item) {
+        item.isAmountless = !item.amount;
+      });
+      return lineItems;
+    };
 
     me.lineItems = [];
 
     me.updateLineItems = function() {
-      me.lineItems = LineItemsService.lineItems;
+      me.lineItems = processLineItems(LineItemsService.lineItems);
       me.graphParts = getMonthlyAmountGraphParts(me.lineItems);
     };
     me.closeLineItem = function(item) {
