@@ -17,9 +17,8 @@
       var debt_amt = 0;
       var earn_amt = 0;
       var aside_amt = 0;
-      var countedItems = 0;
       lineItems.forEach(function(item) {
-        if (!item.amount) {
+        if (item.isAmountless) {
           return;
         }
         if (item.freq.per === 'yr' && item.type === 'minus' && item.freq.split) {
@@ -34,7 +33,6 @@
         } else if (item.type === 'plus') {
           earn_amt += item.amount * item.freq.on.length;
         }
-        countedItems ++;
       });
       if (earn_amt > 0) {
         var debt_width = Math.round(debt_amt / earn_amt * 100);
@@ -42,16 +40,16 @@
         var result = [];
 
         if (debt_amt > 0) {
-          result.push({name: 'Payments', color: '#FF4747', width: debt_width});
+          result.push({name: 'Monthly costs', color: '#FF4747', width: debt_width});
         }
         if (aside_amt > 0) {
-          result.push({name: 'Set-asides', color: '#FFDD45', width: aside_width});
+          result.push({name: 'Monthly set-asides (yearly costs)', color: '#FFDD45', width: aside_width});
         }
         result.push({name: 'Earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)});
 
         return result;
       }
-      if (countedItems === 0) {
+      if (debt_amt + aside_amt === 0) {
         return [ {name: 'No data', color: '#EEE', width: 100} ];
       }
       return [ {name: 'All debt :(', color: '#FF4747', width: 100} ];
