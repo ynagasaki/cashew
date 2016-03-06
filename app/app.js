@@ -5,7 +5,6 @@
 
   angular.module('cashewApp', [
     'ngRoute',
-    'cashewApp.view2',
     'cashewApp.Dashboard',
     'cashewApp.LineItemAdder',
     'cashewApp.Planner',
