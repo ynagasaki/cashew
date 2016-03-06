@@ -9,6 +9,7 @@
     'cashewApp.Dashboard',
     'cashewApp.LineItemAdder',
     'cashewApp.Planner',
+    'cashewApp.History',
     'cashewApp.version',
     'cashewApp.services'
   ])
