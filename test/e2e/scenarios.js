@@ -5,17 +5,17 @@
 describe('my app', function() {
   it('should automatically redirect to dashboard when location hash/fragment is empty', function() {
     browser.get('index.html');
-    expect(browser.getLocationAbsUrl()).toMatch("/");
-    /*expect(element.all)*/
+    expect(browser.getLocationAbsUrl()).toMatch('/');
+    expect(element(by.id('calendar'))).toBeDefined();
   });
 
-  describe('view1', function() {
+  describe('Planning tab', function() {
     beforeEach(function() {
-      browser.get('index.html#/line-items');
+      browser.get('index.html#/plan');
     });
 
-    it('should render view1 when user navigates to /view1', function() {
-      expect(element.all(by.css('[ng-view] div')).first().getText()).toBeDefined();
+    it('should render line item adder when user navigates to /plan', function() {
+      expect(element(by.id('itemAdder'))).toBeDefined();
     });
   });
 });

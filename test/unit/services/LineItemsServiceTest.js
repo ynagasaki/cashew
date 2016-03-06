@@ -62,7 +62,7 @@
 
           $httpBackend.expect('PUT', /\/api\/update\/line-item/).respond(
             function(method, url, data, headers, params) {
-              return [400, { msg: 'mock error (test)' }];
+              return [400, { msg: '(this is a mock error for a test)' }];
             }
           );
 
