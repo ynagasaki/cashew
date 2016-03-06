@@ -17,4 +17,4 @@
     console.log($scope);
     console.log(PayablesService);
   }]);
-})();
+}());

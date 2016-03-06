@@ -43,7 +43,7 @@
       UTILS.requestJson('PUT', path, design_doc, success_func);
     };
 
-    UTILS.request('GET', path, 
+    UTILS.request('GET', path,
       /* If the design doc exists, delete it first, then create it */
       function(result) {
         var rev = result._rev;
@@ -62,4 +62,4 @@
   } else {
     check_couchdb(create_design);
   }
-})();
+}());

@@ -8,7 +8,7 @@
 
     serv.payables = [];
     serv.paymentsFrom = null;
-    serv.patmentsTo = null;
+    serv.paymentsTo = null;
 
     serv.addToPayments = function(payable, payment) {
       var paymentDate = moment([payment.year, payment.month - 1, payment.day]);

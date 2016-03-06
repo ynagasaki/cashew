@@ -318,5 +318,32 @@
         done();
       });
     });
+
+    it('should only get payments within date range', function(done) {
+      var from = moment('2016-01-01');
+      var to = moment('2016-03-01');
+      UTILS.request('get', 'api/get/payments/' + from.unix() + '/' + to.unix(), function(result) {
+        var actual, expected;
+
+        assert.equal(result.data.length, 2);
+
+        actual = result.data[0];
+        expected = PAYMENTS[0][0];
+        assert.equal(actual.year, expected.year);
+        assert.equal(actual.month, expected.month);
+        assert.equal(actual.day, expected.day);
+
+        actual = result.data[1];
+        expected = PAYMENTS[0][1];
+        assert.equal(actual.year, expected.year);
+        assert.equal(actual.month, expected.month);
+        assert.equal(actual.day, expected.day);
+
+        done();
+      }, function() {
+        assert.fail();
+        done();
+      });
+    });
   });
-})();
+}());

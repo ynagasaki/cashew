@@ -70,4 +70,4 @@
   exports.requestJson = request_json;
   exports.requestGeneral = request_in_general;
   exports.NOOP = function() {};
-})();
+}());

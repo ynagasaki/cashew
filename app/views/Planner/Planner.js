@@ -84,4 +84,4 @@
 
     LineItemsService.refresh(moment().startOf('day'));
   }]);
-})();
+}());

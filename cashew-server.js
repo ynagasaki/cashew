@@ -10,6 +10,14 @@
   var app = express();
   var jsonParser = bodyParser.json();
 
+  var createFilterFromTo = function(req) {
+    var from = moment.unix(req.params.from).add(-12, 'months');
+    var to = moment.unix(req.params.to);
+    var start = [from.year(), from.month()+1, from.date(), null];
+    var end = [to.year(), to.month()+1, to.date(), {}];
+    return {startkey: start, endkey: end};
+  };
+
   app.use(express.static('app'));
 
   app.get('/hello', function(req, res) {
@@ -34,12 +42,6 @@
   });
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
-    var from = moment.unix(req.params.from).add(-12, 'months');
-    var to = moment.unix(req.params.to);
-    var start = [from.year(), from.month()+1, from.date(), null];
-    var end = [to.year(), to.month()+1, to.date(), {}];
-
-    /*console.log('get/payables/' + from.format('YYYY-MM-DD') + '/' + to.format('YYYY-MM-DD'));*/
     cashew_db.view('app', 'payables', function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
@@ -65,7 +67,7 @@
       }
 
       /* Get da payments */
-      var filter = {startkey: start, endkey: end};
+      var filter = createFilterFromTo(req);
       cashew_db.view('app', 'payments', filter, function(err, body) {
         if (err) {
           res.status(500).json({ msg: 'error: could not get payments', data: err});
@@ -95,6 +97,24 @@
 
         res.json({ data: items });
       });
+    });
+  });
+
+  app.get('/api/get/payments/:from/:to', function(req, res) {
+    var filter = createFilterFromTo(req);
+
+    cashew_db.view('app', 'payments', filter, function(err, body) {
+      if (err) {
+        res.status(500).json({ msg: 'error: could not get payments', data: err});
+        return;
+      }
+
+      var items = [];
+      body.rows.forEach(function(row) {
+        items.push(row.value);
+      });
+
+      res.json({ data: items });
     });
   });
 
@@ -168,4 +188,4 @@
     var port = server.address().port;
     console.log('cashew listening at http://%s:%s', host, port);
   });
-})();
+}());

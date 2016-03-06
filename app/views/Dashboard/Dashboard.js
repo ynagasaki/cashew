@@ -220,4 +220,4 @@
     PayablesService.refresh(now, aMonthLater);
   }]);
 
-})();
+}());
