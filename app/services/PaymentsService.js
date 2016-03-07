@@ -10,7 +10,7 @@
 
     serv.refresh = function(momentFrom) {
       if (!momentFrom) {
-        console.warn('momentFrom not specified, NOOP');
+        console.log('momentFrom not specified, NOOP');
         return;
       }
       $http.get('/api/get/payments/' + momentFrom.unix()).then(function(result) {
@@ -23,7 +23,7 @@
       });
     };
 
-    $rootScope.$on('payables.paid', serv.refresh);
+    $rootScope.$on('payables.paid', function() { serv.refresh(); });
 
     return serv;
   }]);

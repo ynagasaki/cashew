@@ -122,8 +122,8 @@
       });
     };
 
-    $rootScope.$on('lineitems.added', serv.refresh);
-    $rootScope.$on('lineitems.removed', serv.refresh);
+    $rootScope.$on('lineitems.added', function() { serv.refresh(); });
+    $rootScope.$on('lineitems.removed', function() { serv.refresh(); });
 
     return serv;
   }]);
