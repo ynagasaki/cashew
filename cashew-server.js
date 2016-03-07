@@ -10,12 +10,23 @@
   var app = express();
   var jsonParser = bodyParser.json();
 
-  var createFilterFromTo = function(req) {
-    var from = moment.unix(req.params.from).add(-12, 'months');
-    var to = moment.unix(req.params.to);
-    var start = [from.year(), from.month()+1, from.date(), null];
-    var end = [to.year(), to.month()+1, to.date(), {}];
-    return {startkey: start, endkey: end};
+  var createFilterFromMoments = function(momentFrom, momentTo) {
+    var result;
+    if (!momentFrom && !momentTo) {
+      return null;
+    }
+    result = {};
+    if (momentFrom) {
+      result.startkey = [momentFrom.year(), momentFrom.month()+1, momentFrom.date(), null];
+    } else {
+      result.startkey = [null];
+    }
+    if (momentTo) {
+      result.endkey = [momentTo.year(), momentTo.month()+1, momentTo.date(), {}];
+    } else {
+      result.endkey = [{}];
+    }
+    return result;
   };
 
   app.use(express.static('app'));
@@ -43,13 +54,15 @@
 
   app.get('/api/get/payables/:from/:to', function(req, res) {
     cashew_db.view('app', 'payables', function(err, body) {
+      var from, to, items, itemsMap;
+
       if (err) {
         res.status(500).json({ msg: 'error: could not get payables', data: err});
         return;
       }
 
-      var items = [];
-      var itemsMap = {};
+      items = [];
+      itemsMap = {};
 
       /*console.log('* Retrieved payables: ' + body.rows.length);*/
       body.rows.forEach(function(row) {
@@ -67,8 +80,10 @@
       }
 
       /* Get da payments */
-      var filter = createFilterFromTo(req);
-      cashew_db.view('app', 'payments', filter, function(err, body) {
+      from = moment.unix(req.params.from).add(-12, 'months');
+      to = moment.unix(req.params.to);
+
+      cashew_db.view('app', 'payments', createFilterFromMoments(from, to), function(err, body) {
         if (err) {
           res.status(500).json({ msg: 'error: could not get payments', data: err});
           return;
@@ -100,10 +115,9 @@
     });
   });
 
-  app.get('/api/get/payments/:from/:to', function(req, res) {
-    var filter = createFilterFromTo(req);
-
-    cashew_db.view('app', 'payments', filter, function(err, body) {
+  app.get('/api/get/payments/:from', function(req, res) {
+    var from = moment.unix(req.params.from);
+    cashew_db.view('app', 'payments', createFilterFromMoments(from), function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payments', data: err});
         return;
@@ -120,9 +134,8 @@
 
   app.get('/api/get/line-items/:from', function(req, res) {
     var from = moment.unix(req.params.from).add(1, 'seconds').unix();
-    var filter = {startkey: [from, null, null]};
     /*console.log('GET from: ' + from);*/
-    cashew_db.view('app', 'line-items', filter, function(err, body) {
+    cashew_db.view('app', 'line-items', {startkey: [from, null, null]}, function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get line items', data: err});
         return;

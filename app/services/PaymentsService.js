@@ -8,11 +8,12 @@
 
     serv.payments = [];
 
-    serv.refresh = function(momentFrom, momentTo) {
-      if (!momentFrom || !momentTo) {
+    serv.refresh = function(momentFrom) {
+      if (!momentFrom) {
+        console.warn('momentFrom not specified, NOOP');
         return;
       }
-      $http.get('/api/get/payments/' + momentFrom.unix() + '/' + momentTo.unix()).then(function(result) {
+      $http.get('/api/get/payments/' + momentFrom.unix()).then(function(result) {
         if (result.data.data) {
           serv.payments = result.data.data;
           $rootScope.$broadcast('payments.refreshed');

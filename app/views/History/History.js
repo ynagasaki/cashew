@@ -23,6 +23,6 @@
 
     $scope.$on('payments.refreshed', me.updatePayments);
 
-    PaymentsService.refresh(moment(now).add(-1, 'years'), moment(now).add(1, 'months'));
+    PaymentsService.refresh(moment(now).add(-1, 'years'));
   }]);
 }());
