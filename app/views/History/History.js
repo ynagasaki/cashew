@@ -11,10 +11,18 @@
     });
   }]);
 
-  history.controller('HistoryController', ['$scope', 'PayablesService', function($scope, PayablesService) {
+  history.controller('HistoryController', ['$scope', 'PaymentsService', function($scope, PaymentsService) {
     var me = this;
-    console.log(me);
-    console.log($scope);
-    console.log(PayablesService);
+    var now = moment().startOf('day');
+
+    me.payments = [];
+
+    me.updatePayments = function() {
+      me.payments = PaymentsService.payments;
+    };
+
+    $scope.$on('payments.refreshed', me.updatePayments);
+
+    PaymentsService.refresh(moment(now).add(-1, 'years'), moment(now).add(1, 'months'));
   }]);
 }());
