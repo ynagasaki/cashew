@@ -196,9 +196,17 @@
     });
   });
 
+  var dbname = process.argv.find(function(item) { return /^--dbname=[a-zA-Z_]+$/.test(item); });
+
+  if (dbname) {
+    dbname = dbname.split('=')[1];
+    cashew_db = nano.db.use(dbname);
+    console.log("* using cashew_db=" + dbname + "\n");
+  }
+
   var server = app.listen(PORT, function() {
     var host = server.address().address;
     var port = server.address().port;
-    console.log('cashew listening at http://%s:%s', host, port);
+    console.log('* cashew listening at http://%s:%s', host, port);
   });
 }());

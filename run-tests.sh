@@ -5,6 +5,8 @@ declare UNIT=0
 declare SERVER_UNIT=0
 declare PROTRACTOR=0
 
+declare -r APP_NAME="cashew_test"
+
 while getopts 'husp' flag; do
   case "${flag}" in
     h) HINT=1 ;;
@@ -14,9 +16,12 @@ while getopts 'husp' flag; do
   esac
 done
 
-node "cashew-server.js" &
+echo "## Preparing test DB and server instance"
+node "reset-db.js" "--reinstall" "--appname=${APP_NAME}"
+node "cashew-server.js" "--dbname=${APP_NAME}" &
 declare SERVER_PID=$!
 trap "kill $SERVER_PID" 0 1 2 3 4 5 6 7 8 9 10
+echo
 
 sleep 1
 
@@ -47,3 +52,5 @@ if [[ PROTRACTOR -eq 1 ]]; then
   echo "(Done)"
   echo
 fi
+
+echo "(Exiting tests)"

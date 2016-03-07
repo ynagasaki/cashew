@@ -55,7 +55,14 @@
     );
   };
 
-  if (process.argv[2] && process.argv[2] === '--reinstall') {
+  var appNameArgument = process.argv.find(function(item) { return /^--appname=[a-zA-Z_]+$/.test(item); });
+
+  if (appNameArgument) {
+    app_name = appNameArgument.split('=')[1];
+    console.log("* Setting app_name=" + app_name + "\n");
+  }
+
+  if (process.argv.some(function(item) { return /^--reinstall$/.test(item); })) {
     check_couchdb(function() {
       UTILS.request('GET', app_name, wipe_db, create_db);
     });
