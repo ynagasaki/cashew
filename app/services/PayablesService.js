@@ -81,7 +81,7 @@
           day: payable.original.dueDate.date()
         };
       }
-      /* Post payment */
+      /* Post payment -- TODO(yoshiyuk): probably move this to PaymentsService */
       $http.put('/api/pay', payment).then(function(result) {
         var payload = result.data.data;
         if (payload.ok) {
@@ -94,6 +94,7 @@
             payable.amount = payment.amount;
             payable.suggestedAmount = payment.amount;
           }
+          $rootScope.$broadcast('payables.paid');
         } else {
           payable.payment = null;
           console.log('failed to pay ' + payable.name + ': ' + result.data);
