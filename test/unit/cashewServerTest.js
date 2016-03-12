@@ -46,7 +46,7 @@
         UTILS.requestJson('put', path, datum, function(res) {
           datum.id = res.data.id;
           datum.rev = res.data.rev;
-          /*console.log('    * put ' + itemToString(i, datum));*/
+          console.log('    * put ' + itemToString(i, datum));
           if (success) {
             success(i, datum);
           }
@@ -68,7 +68,7 @@
     }
 
     before(function(done) {
-      /*console.log('  * before:');*/
+      console.log('  * before:');
       var success = function(i, datum) {
         PAYMENTS[i].forEach(function(payment) {
           payment.amount = datum.amount;
