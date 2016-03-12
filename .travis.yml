@@ -11,7 +11,7 @@ before_script:
   - node reset-db.js --reinstall # setup cashew couchdb
   - npm start > /dev/null &
   - npm run update-webdriver
-  - sleep 1 # give stuff time to start
+  - sleep 5 # give stuff time to start
 
 script:
   - node_modules/.bin/jshint app/ couchdb/ cashew-server.js reset-db.js --config .jshintrc --exclude app/bower_components
