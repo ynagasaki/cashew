@@ -1,12 +1,13 @@
 'use strict';
 
+var nano = require('nano')('http://localhost:5984');
+var express = require('express');
+var bodyParser = require('body-parser');
+var momentjs = require('moment');
+
 (function() {
   var PORT = 8172;
-  var nano = require('nano')('http://localhost:5984');
   var cashew_db = nano.db.use('cashew');
-  var express = require('express');
-  var bodyParser = require('body-parser');
-  var moment = require('moment');
   var app = express();
   var jsonParser = bodyParser.json();
 
@@ -80,8 +81,8 @@
       }
 
       /* Get da payments */
-      from = moment.unix(req.params.from).add(-12, 'months');
-      to = moment.unix(req.params.to);
+      from = momentjs.unix(req.params.from).add(-12, 'months');
+      to = momentjs.unix(req.params.to);
 
       cashew_db.view('app', 'payments', createFilterFromMoments(from, to), function(err, body) {
         if (err) {
@@ -116,7 +117,7 @@
   });
 
   app.get('/api/get/payments/:from', function(req, res) {
-    var from = moment.unix(req.params.from);
+    var from = momentjs.unix(req.params.from);
     cashew_db.view('app', 'payments', createFilterFromMoments(from), function(err, body) {
       if (err) {
         res.status(500).json({ msg: 'error: could not get payments', data: err});
@@ -133,7 +134,7 @@
   });
 
   app.get('/api/get/line-items/:from', function(req, res) {
-    var from = moment.unix(req.params.from).add(1, 'seconds').unix();
+    var from = momentjs.unix(req.params.from).add(1, 'seconds').unix();
     /*console.log('GET from: ' + from);*/
     cashew_db.view('app', 'line-items', {startkey: [from, null, null]}, function(err, body) {
       if (err) {
