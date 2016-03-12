@@ -91,7 +91,7 @@
         /* this shouldn't be explicitly nec, since only payments within the last year are retrieved, but do it anyway */
         cutoffDate = moment(item.dueDate).add(-1, 'years');
         result = item.amount;
-        for (var i in item.payments) {
+        for (var i = 0, len = item.payments.length; i < len; ++i) {
           var payment = item.payments[i];
           if (cutoffDate.isBefore([payment.year, payment.month - 1, payment.day])) {
             result -= payment.amount;
