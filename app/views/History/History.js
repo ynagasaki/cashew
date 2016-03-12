@@ -46,7 +46,7 @@
           stackBars: true,
           axisY: {
             labelInterpolationFnc: function(value) {
-              var intValue = parseInt(value);
+              var intValue = parseInt(value, 10);
               return (intValue === value) ? intValue : null;
             }
           }

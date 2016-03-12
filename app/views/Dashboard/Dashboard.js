@@ -12,12 +12,12 @@
     });
   }]);
 
-  var ctrl = function($scope, $location, PayablesService) {
+  dashboard.controller('DashboardController', ['$scope', '$location', 'PayablesService', function($scope, $location, PayablesService) {
     var me = this;
     var now = null;
     var yesterday = null; /* moment#isBetween is exclusive :\ */
     var aMonthLater = null;
-    var debugPeriod = parseInt($location.search().debugPeriod);
+    var debugPeriod = parseInt($location.search().debugPeriod, 10);
 
     me.asides = [];
     me.payables = [];
@@ -86,11 +86,19 @@
       }
     };
     me.calculateRemainingAmount = function(item) {
-      var result = item.amount;
-      if (item.payments) {
-        item.payments.forEach(function(payment) {
-          result -= payment.amount;
-        });
+      var cutoffDate, result;
+      if (item.subtype === 'yearly' && item.payments) {
+        /* this shouldn't be explicitly nec, since only payments within the last year are retrieved, but do it anyway */
+        cutoffDate = moment(item.dueDate).add(-1, 'years');
+        result = item.amount;
+        for (var i in item.payments) {
+          var payment = item.payments[i];
+          if (cutoffDate.isBefore([payment.year, payment.month - 1, payment.day])) {
+            result -= payment.amount;
+          } else {
+            break;
+          }
+        }
         if (result < item.amount) {
           item.remainingAmount = result;
         }
@@ -219,8 +227,6 @@
     })();
 
     PayablesService.refresh(now, aMonthLater);
-  };
-
-  dashboard.controller('DashboardController', ['$scope', '$location', 'PayablesService', ctrl]);
+  }]);
 
 }());
