@@ -12,15 +12,17 @@
     });
   }]);
 
-  dashboard.controller('DashboardController', ['$scope', 'PayablesService', function($scope, PayablesService) {
+  var ctrl = function($scope, $location, PayablesService) {
     var me = this;
     var now = null;
     var yesterday = null; /* moment#isBetween is exclusive :\ */
     var aMonthLater = null;
+    var debugPeriod = parseInt($location.search().debugPeriod);
 
     me.asides = [];
     me.payables = [];
     me.expandedItem = null;
+    me.debugPeriod = isNaN(debugPeriod) ? 0 : debugPeriod;
 
     me.setPeriod = function(val) {
       now = moment(val).startOf('day');
@@ -93,7 +95,6 @@
           item.remainingAmount = result;
         }
       }
-      return result;
     };
     me.getMonthlyPayableDueDate = function(payable) {
       var candidate1 = moment(now).date(payable.day);
@@ -199,7 +200,7 @@
 
     $scope.$on('payables.refreshed', me.updatePayables);
 
-    me.setPeriod(moment());
+    me.setPeriod((me.debugPeriod) ? moment().add(me.debugPeriod, 'months') : moment());
 
     me.datesArray = (function() {
       var start = moment(now).startOf('week');
@@ -218,6 +219,8 @@
     })();
 
     PayablesService.refresh(now, aMonthLater);
-  }]);
+  };
+
+  dashboard.controller('DashboardController', ['$scope', '$location', 'PayablesService', ctrl]);
 
 }());

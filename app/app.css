@@ -252,3 +252,8 @@ div.no-bg-color {
     display: none;
   }
 }
+.debug-panel {
+  position: fixed;
+  top: 5px;
+  right: 5px;
+}

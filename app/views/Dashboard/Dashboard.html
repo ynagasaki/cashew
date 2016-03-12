@@ -42,6 +42,11 @@
     </p>
   </div>
   <div class="pure-u-1 pure-u-md-2-3">
+    <div class="debug-panel" ng-hide="!dash.debugPeriod">
+      <a ng-href="#/?debugPeriod={{dash.debugPeriod - 1}}">prev</a>
+      {{ dash.getNow().toDate() | date }}
+      <a ng-href="#/?debugPeriod={{dash.debugPeriod + 1}}">next</a>
+    </div>
     <div class="hide-lt-md">
       <table id="calendar" class="pure-table pure-table-bordered">
         <thead>

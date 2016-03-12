@@ -14,7 +14,8 @@
     "exports": false,
     "process": false,
     "emit": false,
-    "moment": false
+    "moment": false,
+    "Chartist": false
   },
   "eqeqeq": true,
   "curly": true,
