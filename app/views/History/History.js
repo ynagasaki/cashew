@@ -16,16 +16,41 @@
     var now = moment().startOf('day');
     var getGraphData = function(payments) {
       var result = { labels: [], series: [] };
-      var last = null;
+      var key, groupedPayments;
       var frame = [];
+      var startDate = moment(now).add(-1, 'years');
+      var paymentsMap = {};
+      var firstDate = null;
+
       payments.forEach(function(payment) {
-        if (last === null || last.year !== payment.year || last.month !== payment.month) {
-          result.labels.push(payment.month + '/' + payment.year);
+        var paymentDate = moment([payment.year, payment.month - 1, 1]);
+        var k = paymentDate.format('MMM YYYY');
+        if (firstDate === null) {
+          firstDate = paymentDate;
+        }
+        groupedPayments = paymentsMap[k];
+        if (!groupedPayments) {
+          paymentsMap[k] = groupedPayments = [];
+        }
+        groupedPayments.push(payment);
+      });
+
+      if (startDate.isBefore(firstDate)) {
+        startDate = firstDate;
+      }
+
+      for (var i = 0; i < 13; ++ i) {
+        key = startDate.format('MMM YYYY');
+        result.labels.push(key);
+        groupedPayments = paymentsMap[key];
+        if (groupedPayments) {
+          frame.push(groupedPayments.reduce(function(sum, pmt) { return sum + pmt.amount; }, 0));
+        } else {
           frame.push(0);
         }
-        frame[frame.length - 1] += payment.amount;
-        last = payment;
-      });
+        startDate.add(1, 'months');
+      }
+
       result.series.push(frame);
       return result;
     };
