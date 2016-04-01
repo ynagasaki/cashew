@@ -209,12 +209,18 @@
         })
       );
 
-      it('should add "remainingAmount" to payables with partial payments',
+      it('should add "remainingAmount" to yearly payables with partial payments ONLY within the last year',
         inject(function($controller) {
           var controller = setupController($controller, moment(), []);
           var item = {
             amount: 100,
-            payments: [ {amount: 20}, {amount: 20} ]
+            subtype: 'yearly',
+            dueDate: moment('2016-02-01'),
+            payments: [
+              { amount: 20, year: 2016, month: 1, day: 15 },
+              { amount: 20, year: 2015, month: 10, day: 23 },
+              { amount: 20, year: 2015, month: 1, day: 30}
+            ]
           };
           controller.calculateRemainingAmount(item);
           expect(item.remainingAmount).toBeDefined();
@@ -222,12 +228,28 @@
         })
       );
 
-      it('should NOT add "remainingAmount" to payables with no payments',
+      it('should NOT add "remainingAmount" to yearly payables with no payments',
         inject(function($controller) {
           var controller = setupController($controller, moment(), []);
           var item = {
             amount: 100,
+            subtype: 'yearly',
+            dueDate: moment(),
             payments: []
+          };
+          controller.calculateRemainingAmount(item);
+          expect(item.remainingAmount).toBeUndefined();
+        })
+      );
+
+      it('should NOT add "remainingAmount" to monthly payables',
+        inject(function($controller) {
+          var controller = setupController($controller, moment(), []);
+          var item = {
+            amount: 100,
+            subtype: 'monthly',
+            dueDate: moment('2016-01-01'),
+            payments: [{ amount: 10, year: 2015, month: 12, day: 10 }]
           };
           controller.calculateRemainingAmount(item);
           expect(item.remainingAmount).toBeUndefined();
