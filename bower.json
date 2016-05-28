@@ -12,6 +12,6 @@
     "angular-mocks": "~1.4.0",
     "html5-boilerplate": "~5.2.0",
     "moment": "~2.10.6",
-    "chartist": "^0.9.7"
+    "Chart.js": "^2.1.4"
   }
 }

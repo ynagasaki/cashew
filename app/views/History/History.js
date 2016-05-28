@@ -15,9 +15,10 @@
     var me = this;
     var now = moment().startOf('day');
     var getGraphData = function(payments) {
-      var result = { labels: [], series: [] };
+      var result = { labels: [], datasets: [] };
+      var dataset = { label: 'Payable amount spent', data: [] };
+
       var key, groupedPayments;
-      var frame = [];
       var startDate = moment(now).add(-1, 'years');
       var paymentsMap = {};
       var firstDate = null;
@@ -44,14 +45,14 @@
         result.labels.push(key);
         groupedPayments = paymentsMap[key];
         if (groupedPayments) {
-          frame.push(groupedPayments.reduce(function(sum, pmt) { return sum + pmt.amount; }, 0));
+          dataset.data.push(groupedPayments.reduce(function(sum, pmt) { return sum + pmt.amount; }, 0));
         } else {
-          frame.push(0);
+          dataset.data.push(0);
         }
         startDate.add(1, 'months');
       }
 
-      result.series.push(frame);
+      result.datasets.push(dataset);
       return result;
     };
 
@@ -64,26 +65,23 @@
     };
     me.initGraph = function(graphData) {
       if (!me.graph) {
-        me.graph = new Chartist.Bar('#payment-history', {
-          labels: [],
-          series: []
-        }, {
-          stackBars: true,
-          axisY: {
-            labelInterpolationFnc: function(value) {
-              var intValue = parseInt(value, 10);
-              return (intValue === value) ? intValue : null;
+        Chart.defaults.global.legend.display = false;
+        me.graph = new Chart(document.getElementById('payment-history'), {
+          type: 'bar',
+          data: graphData,
+          options: {
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true
+                }
+              }]
             }
-          }
-        }).on('draw', function(data) {
-          if(data.type === 'bar') {
-            data.element.attr({
-              style: 'stroke-width: 30px'
-            });
           }
         });
       }
-      me.graph.update(graphData);
+      me.graph.data.datasets = graphData.datasets;
+      me.graph.update();
     };
 
     $scope.$on('payments.refreshed', me.updatePayments);
