@@ -15,7 +15,8 @@
     "process": false,
     "emit": false,
     "moment": false,
-    "Chartist": false
+    "Chart": false,
+    "document": false
   },
   "eqeqeq": true,
   "curly": true,
