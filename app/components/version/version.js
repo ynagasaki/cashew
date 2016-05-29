@@ -5,4 +5,4 @@ angular.module('cashewApp.version', [
   'cashewApp.version.version-directive'
 ])
 
-.value('version', '1.1.2');
+.value('version', '1.1.3');
