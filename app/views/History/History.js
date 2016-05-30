@@ -14,27 +14,33 @@
   history.controller('HistoryController', ['$scope', 'PaymentsService', function($scope, PaymentsService) {
     var me = this;
     var now = moment().startOf('day');
-    var getGraphData = function(payments) {
-      var result = { labels: [], datasets: [] };
-      var dataset = { label: 'Payable amount spent', data: [] };
-
-      var key, groupedPayments;
-      var startDate = moment(now).add(-1, 'years');
-      var paymentsMap = {};
-      var firstDate = null;
-
+    var groupPayments = function(payments) {
+      var result = {
+        paymentsMap: {},
+        firstDate: null
+      };
+      var groupedPayments;
       payments.forEach(function(payment) {
         var paymentDate = moment([payment.year, payment.month - 1, 1]);
         var k = paymentDate.format('MMM YYYY');
-        if (firstDate === null) {
-          firstDate = paymentDate;
+        if (result.firstDate === null) {
+          result.firstDate = paymentDate;
         }
-        groupedPayments = paymentsMap[k];
+        groupedPayments = result.paymentsMap[k];
         if (!groupedPayments) {
-          paymentsMap[k] = groupedPayments = [];
+          result.paymentsMap[k] = groupedPayments = [];
         }
         groupedPayments.push(payment);
       });
+      return result;
+    };
+    var getGraphData = function(paymentsByDate) {
+      var result = { labels: [], datasets: [] };
+      var dataset = { label: 'Total', data: [] };
+      var key;
+      var groupedPayments;
+      var startDate = moment(now).add(-1, 'years');
+      var firstDate = paymentsByDate.firstDate;
 
       if (startDate.isBefore(firstDate)) {
         startDate = firstDate;
@@ -43,7 +49,7 @@
       for (var i = 0; i < 13; ++ i) {
         key = startDate.format('MMM YYYY');
         result.labels.push(key);
-        groupedPayments = paymentsMap[key];
+        groupedPayments = paymentsByDate.paymentsMap[key];
         if (groupedPayments) {
           dataset.data.push(groupedPayments.reduce(function(sum, pmt) { return sum + pmt.amount; }, 0));
         } else {
@@ -61,7 +67,8 @@
 
     me.updatePayments = function() {
       me.payments = PaymentsService.payments;
-      me.initGraph(getGraphData(me.payments));
+      me.paymentsByDate = groupPayments(me.payments);
+      me.initGraph(getGraphData(me.paymentsByDate));
     };
     me.initGraph = function(graphData) {
       if (!me.graph) {
