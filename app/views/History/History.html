@@ -1,6 +1,10 @@
 <div class="pure-g">
   <div class="pure-u-1">
     <div style="padding: 10px;">
+      <label for="tagCategories">Category:</label>
+      <select id="tagCategories" ng-model="hist.selectedCategory" ng-change="hist.updateGraphCategory()">
+        <option ng-repeat="cat in hist.getTagCategoriesList()" value="{{cat}}">{{hist.getConstant(cat)}}</option>
+      </select>
       <canvas id="payment-history" width="500" height="200"></canvas>
     </div>
     <!--

@@ -70,7 +70,12 @@
         year: dueDate.year(),
         month: dueDate.month() + 1,
         day: dueDate.date(),
-        amount: (payable.remainingAmount) ? payable.remainingAmount : payable.amount
+        amount: (payable.remainingAmount) ? payable.remainingAmount : payable.amount,
+        tags: {
+          name: payable.name,
+          freqType: payable.subtype,
+          costType: payable.isAmountless ? 'variable' : 'fixed'
+        }
       };
       if (payable.subtype === 'setaside') {
         payment.payableInstance = {
