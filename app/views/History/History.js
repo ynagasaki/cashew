@@ -19,7 +19,17 @@
       'rgba(90, 180, 242, 1)',
       'rgba(255, 206, 73, 1)',
       'rgba(255, 97, 130, 1)',
-      'rgba(68, 192, 193, 1)'
+      'rgba(68, 192, 193, 1)',
+      'rgba(194, 196, 210, .6)',
+      'rgba(90, 180, 242, .6)',
+      'rgba(255, 206, 73, .6)',
+      'rgba(255, 97, 130, .6)',
+      'rgba(68, 192, 193, .6)',
+      'rgba(194, 196, 210, .3)',
+      'rgba(90, 180, 242, .3)',
+      'rgba(255, 206, 73, .3)',
+      'rgba(255, 97, 130, .3)',
+      'rgba(68, 192, 193, .3)'
     ];
     var constants = {
       _notag: '(Untagged)',
@@ -216,7 +226,7 @@
     me.changeGraphCategory = function(category) {
       me.selectedCategory = category;
       me.updateGraphCategory();
-    }
+    };
 
     $scope.$on('payments.refreshed', me.updatePayments);
 
