@@ -228,6 +228,9 @@
       me.selectedCategory = category;
       me.updateGraphCategory();
     };
+    me.hasTags = function() {
+      return !!me.tagCategories;
+    };
 
     $scope.$on('payments.refreshed', me.updatePayments);
 
