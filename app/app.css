@@ -238,14 +238,19 @@ div.no-bg-color {
 }
 .button-group button:first-child {
   border: 1px solid #ccc;
-  border-bottom-right-radius: 0px;
-  border-top-right-radius: 0px;
+  border-bottom-left-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.button-group button {
+  border: 1px solid #ccc;
+  border-left: 0;
+  border-radius: 0px;
 }
 .button-group button:last-child {
   border: 1px solid #ccc;
   border-left: 0;
-  border-bottom-left-radius: 0px;
-  border-top-left-radius: 0px;
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
 }
 @media screen and (max-width: 48em) {
   .hide-lt-md {

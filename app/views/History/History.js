@@ -35,13 +35,8 @@
     var sumPayments = function(sum, pmt) {
       return sum + pmt.amount;
     };
-    var getFirstKey = function(dict) {
-      for (var key in dict) {
-        if (dict.hasOwnProperty(key)) {
-          return key;
-        }
-      }
-      return null;
+    var round = function(num) {
+      return Math.round(num * 100) / 100;
     };
     var groupPaymentsByDate = function(payments) {
       var result = {
@@ -124,10 +119,12 @@
           if (!datasetList) {
             datasets[tag].push(0);
           } else {
-            datasets[tag].push(datasetList.reduce(sumPayments, 0));
+            datasets[tag].push(round(datasetList.reduce(sumPayments, 0)));
           }
         }
-        datasets._notag.push(tagGroupedPayments._notag.reduce(sumPayments, 0));
+        datasets._notag.push(
+          round(tagGroupedPayments._notag.reduce(sumPayments, 0))
+        );
         startDate.add(1, 'months');
       }
       i = 0;
@@ -189,13 +186,15 @@
     me.initGraph = function(graphData) {
       if (!me.graph) {
         /*Chart.defaults.global.legend.display = false;*/
+        Chart.defaults.global.legend.onClick = null;
+        Chart.defaults.global.legend.labels.boxWidth = 12;
         me.graph = new Chart(document.getElementById('payment-history'), {
           type: 'bar',
           data: graphData,
           options: {
             scales: {
               xAxes: [{
-                stacked: true,
+                stacked: true
               }],
               yAxes: [{
                 stacked: true,
@@ -214,6 +213,10 @@
       var result = constants[key];
       return !result ? key : result;
     };
+    me.changeGraphCategory = function(category) {
+      me.selectedCategory = category;
+      me.updateGraphCategory();
+    }
 
     $scope.$on('payments.refreshed', me.updatePayments);
 
