@@ -114,7 +114,7 @@
       if (startDate.isBefore(firstDate)) {
         startDate = firstDate;
       }
-      for (i = 0; i < tagsList.length; i ++) {
+      for (i = 0; !!tagsList && i < tagsList.length; i ++) {
         tag = tagsList[i];
         datasets[tag] = [];
       }
@@ -123,7 +123,7 @@
         result.labels.push(key);
         dateGroupedPayments = paymentsByDate.paymentsMap[key];
         tagGroupedPayments = groupPaymentsByTag(dateGroupedPayments, filterCategory);
-        for (j = 0; j < tagsList.length; j ++) {
+        for (j = 0; !!tagsList && j < tagsList.length; j ++) {
           tag = tagsList[j];
           datasetList = tagGroupedPayments[tag];
           if (!datasetList) {
@@ -186,7 +186,8 @@
     me.updateGraphCategory = function() {
       var paymentsByDate = groupPaymentsByDate(me.payments);
       var filter = me.selectedCategory;
-      var tagsList = Object.keys(me.tagCategories[filter]);
+      var categoryTags = !me.tagCategories ? null : me.tagCategories[filter];
+      var tagsList = !categoryTags ? null : Object.keys(categoryTags);
       me.graphData = getGraphData(paymentsByDate, filter, tagsList);
       me.initGraph(me.graphData);
     };
