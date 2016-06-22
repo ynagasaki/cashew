@@ -77,7 +77,7 @@
       payments.forEach(function(pmt) {
         var l;
         var tagVal;
-        if (pmt.tags) {
+        if (pmt.tags && !!filterCategory) {
           for (var tagCategory in pmt.tags) {
             if (!pmt.tags.hasOwnProperty(tagCategory)) {
               continue;
@@ -152,7 +152,11 @@
       return result;
     };
     var getTagCategories = function(payments) {
-      var categories = {};
+      var categories;
+      if (payments.length === 0) {
+        return null;
+      }
+      categories = {};
       payments.forEach(function(p) {
         var items;
         var item;
@@ -174,19 +178,18 @@
 
     me.payments = [];
     me.graph = null;
-    me.selectedCategory = null;
+    me.selectedCategory = 'costType';
     me.tagCategories = null;
 
     me.updatePayments = function() {
       me.payments = PaymentsService.payments;
       me.tagCategories = getTagCategories(me.payments);
-      me.selectedCategory = 'costType';
       me.updateGraphCategory();
     };
     me.updateGraphCategory = function() {
       var paymentsByDate = groupPaymentsByDate(me.payments);
-      var filter = me.selectedCategory;
-      var categoryTags = !me.tagCategories ? null : me.tagCategories[filter];
+      var filter         = !me.tagCategories ? null :me.selectedCategory;
+      var categoryTags   = !me.tagCategories ? null : me.tagCategories[filter];
       var tagsList = !categoryTags ? null : Object.keys(categoryTags);
       me.graphData = getGraphData(paymentsByDate, filter, tagsList);
       me.initGraph(me.graphData);
@@ -227,9 +230,6 @@
     me.changeGraphCategory = function(category) {
       me.selectedCategory = category;
       me.updateGraphCategory();
-    };
-    me.hasTags = function() {
-      return !!me.tagCategories;
     };
 
     $scope.$on('payments.refreshed', me.updatePayments);

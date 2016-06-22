@@ -1,7 +1,7 @@
 <div class="pure-g">
   <div class="pure-u-1">
     <div style="padding: 10px;">
-      <div class="button-group" ng-show="hist.hasTags()">
+      <div class="button-group" ng-hide="!hist.tagCategories">
         <button class="pure-button"
           ng-class="{'pure-button-active' : hist.selectedCategory === cat}"
           ng-click="hist.changeGraphCategory(cat)"
