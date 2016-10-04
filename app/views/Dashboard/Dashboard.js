@@ -78,7 +78,7 @@
       }
       /* add a suggested amount that's just the last payment made, if available */
       if (item.payments && item.payments.length > 0) {
-        item.suggestedAmount = item.payments[item.payments.length - 1].amount;
+        item.suggestedAmount = item.payments[0].amount;
       } else {
         item.suggestedAmount = 0;
       }

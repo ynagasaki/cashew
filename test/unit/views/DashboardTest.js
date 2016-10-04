@@ -301,7 +301,7 @@
           var controller = setupController($controller, moment(), []);
           var item = {
             payment: {amount: 123},
-            payments: [{amount: 245}]
+            payments: [{amount: 245}, {amount: 678}]
           };
           controller.handleAmountlessItem(item);
           expect(item.suggestedAmount).toBeDefined();
