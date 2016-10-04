@@ -13,43 +13,38 @@
 
   planner.controller('Planner', ['$scope', 'LineItemsService', function($scope, LineItemsService) {
     var me = this;
-    var getMonthlyAmountGraphParts = function(lineItems) {
-      var debt_amt = 0;
-      var earn_amt = 0;
-      var aside_amt = 0;
+    var getDTIGraphParts = function(lineItems) {
+      var debt_amt = {'mo': 0, 'yr': 0};
+      var earn_amt = {'mo': 0, 'yr': 0};
       lineItems.forEach(function(item) {
         if (item.isAmountless) {
           return;
         }
-        if (item.freq.per === 'yr' && item.type === 'minus' && item.freq.split) {
-          aside_amt += item.amount * item.freq.on.length / 12;
-          return;
-        }
-        if (item.freq.per !== 'mo') {
-          return;
-        }
         if (item.type === 'minus') {
-          debt_amt += item.amount * item.freq.on.length;
+          debt_amt[item.freq.per] += item.amount * item.freq.on.length;
         } else if (item.type === 'plus') {
-          earn_amt += item.amount * item.freq.on.length;
+          earn_amt[item.freq.per] += item.amount * item.freq.on.length;
         }
       });
-      if (earn_amt > 0) {
-        var debt_width = Math.round(debt_amt / earn_amt * 100);
-        var aside_width = Math.round(aside_amt / earn_amt * 100);
+      earn_amt.mo *= 12;
+      debt_amt.mo *= 12;
+      var earn_sum = earn_amt.mo + earn_amt.yr;
+      if (earn_sum > 0) {
+        var debt_mo_width = Math.round(debt_amt.mo / earn_sum * 100);
+        var debt_yr_width = Math.round(debt_amt.yr / earn_sum * 100);
         var result = [];
 
-        if (debt_amt > 0) {
-          result.push({name: 'Monthly costs', color: '#FF4747', width: debt_width});
+        if (debt_amt.mo > 0) {
+          result.push({name: 'Monthly costs', color: '#FF4747', width: debt_mo_width});
         }
-        if (aside_amt > 0) {
-          result.push({name: 'Monthly set-asides (yearly costs)', color: '#FFDD45', width: aside_width});
+        if (debt_amt.yr > 0) {
+          result.push({name: 'Yearly costs', color: '#FFDD45', width: debt_yr_width});
         }
-        result.push({name: 'Earnings', color: '#A5E85D', width: 100 - (debt_width + aside_width)});
+        result.push({name: 'Earnings', color: '#A5E85D', width: 100 - (debt_mo_width + debt_yr_width)});
 
         return result;
       }
-      if (debt_amt + aside_amt === 0) {
+      if (debt_amt.mo + debt_amt.yr === 0) {
         return [ {name: 'No data', color: '#EEE', width: 100} ];
       }
       return [ {name: 'All debt :(', color: '#FF4747', width: 100} ];
@@ -65,7 +60,7 @@
 
     me.updateLineItems = function() {
       me.lineItems = processLineItems(LineItemsService.lineItems);
-      me.graphParts = getMonthlyAmountGraphParts(me.lineItems);
+      me.graphParts = getDTIGraphParts(me.lineItems);
     };
     me.closeLineItem = function(item) {
       LineItemsService.close(item);
